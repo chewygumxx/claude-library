@@ -58,20 +58,47 @@ what Claude decides. Given the hook already guarantees the sync, adding a
 parallel `CLAUDE.md` instruction would have been redundant, so none was
 added.
 
-The hook command, exactly as stored in `.claude/settings.json`:
+The logic originally lived as one long inline command in
+`.claude/settings.json`. Moved out to `.claude/hooks/sync-auto-memory-dir.sh`
+for readability, invoked from the hook using exec form so the path
+placeholder needs no shell quoting:
 
-```bash
-root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"; dir="$root/.claude/memory"; cur="$(jq -r '.autoMemoryDirectory // empty' "$root/.claude/settings.json")"; if [ "$cur" != "$dir" ]; then tmp="$root/.claude/settings.json.tmp"; jq --arg d "$dir" '.autoMemoryDirectory = $d' "$root/.claude/settings.json" > "$tmp" && mv "$tmp" "$root/.claude/settings.json"; fi
+```json
+{
+  "type": "command",
+  "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/sync-auto-memory-dir.sh",
+  "args": []
+}
 ```
 
-It resolves the repository root via `git rev-parse --show-toplevel`
-(falling back to the current directory outside a git repo), computes the
-expected `<root>/.claude/memory` path, and only rewrites
-`autoMemoryDirectory` (via a `jq` merge that touches nothing else in the
-file) when the stored value no longer matches. Verified during this
-conversation, on a scratch copy, to be a no-op when already correct and to
-correctly rewrite a deliberately stale path back to the current repository
-root.
+`${CLAUDE_PROJECT_DIR}` is a Claude Code path placeholder, substituted into
+the command and also exported into the spawned process's environment, "the
+project root where the session started." The script itself:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+dir="$root/.claude/memory"
+settings="$root/.claude/settings.json"
+
+cur="$(jq -r '.autoMemoryDirectory // empty' "$settings")"
+if [ "$cur" != "$dir" ]; then
+  tmp="$settings.tmp"
+  jq --arg d "$dir" '.autoMemoryDirectory = $d' "$settings" > "$tmp" && mv "$tmp" "$settings"
+fi
+```
+
+It prefers `$CLAUDE_PROJECT_DIR` (falling back to `git rev-parse
+--show-toplevel`, then the current directory, for when the script is run
+standalone outside a hook invocation), computes the expected
+`<root>/.claude/memory` path, and only rewrites `autoMemoryDirectory` (via a
+`jq` merge that touches nothing else in the file) when the stored value no
+longer matches. Verified, on a scratch copy, to be a no-op when already
+correct and to correctly rewrite a deliberately stale path back to the
+current repository root, both as the original inline command and again
+after extraction to the script file.
 
 ## Caveats worth remembering
 

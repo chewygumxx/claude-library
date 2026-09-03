@@ -7,7 +7,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "root=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"; dir=\"$root/.claude/memory\"; cur=\"$(jq -r '.autoMemoryDirectory // empty' \"$root/.claude/settings.json\")\"; if [ \"$cur\" != \"$dir\" ]; then tmp=\"$root/.claude/settings.json.tmp\"; jq --arg d \"$dir\" '.autoMemoryDirectory = $d' \"$root/.claude/settings.json\" > \"$tmp\" && mv \"$tmp\" \"$root/.claude/settings.json\"; fi"
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/sync-auto-memory-dir.sh",
+            "args": []
           }
         ]
       }
