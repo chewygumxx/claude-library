@@ -53,7 +53,24 @@
       // --- /cd: block moving the session into sensitive directories.
       // Cd path patterns share the //, ~/, / anchors above; "*" matches
       // one segment, "**" crosses segments, and a trailing /** also
-      // matches the named root itself.
+      // matches the named root itself. Cd is not model-invocable, these
+      // rules only apply when a human runs /cd themselves.
+      //
+      // Observed in practice: on a real v2.1.252 install (well past the
+      // "/cd requires v2.1.169+" line in the docs), these three lines
+      // produced a startup warning, "Permission deny rule ... matches no
+      // known tool, check for typos", even though Cd rules are current,
+      // documented syntax and not a typo. The changelog has no "added Cd
+      // permission rules" entry through v2.1.259 either. Best guess, not
+      // confirmed: Cd rule recognition may be gated behind a server-side
+      // feature flag, and `claude doctor` on this same install separately
+      // reported "Feature-flag evaluation disabled (disabled by
+      // DO_NOT_TRACK)", so an environment with DO_NOT_TRACK set may never
+      // see it turn on. Harmless either way, and worth leaving in: the
+      // warning is cosmetic, and Read(...) deny rules plus
+      // sandbox.filesystem.denyRead below already cover these same three
+      // paths, so reads/edits stay blocked regardless of whether /cd
+      // itself is currently being stopped from landing there.
       "Cd(~/.ssh/**)",
       "Cd(~/doc/**)",
       "Cd(~/sec/**)",
