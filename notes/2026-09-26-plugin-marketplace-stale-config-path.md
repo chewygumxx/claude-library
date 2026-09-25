@@ -97,6 +97,42 @@ The stale `projectPath` entries pointing into `~/.local/share/chezmoi`
 subdirectories were deliberately left in place. They are inert install-scope
 records rather than resolution inputs, so they cost nothing.
 
+## Verifying the fix without restarting, and a false alarm
+
+Immediately after the repair, running `/plugin list` inside the already open
+session still reported all ten entries as `✘ failed to load`. This looks like
+the fix having failed, or having merely traded one error for another. It had
+not. **Plugin load status is resolved once at session startup and then cached in
+memory for the life of the session.** The session predated the repair by four
+minutes, so the slash command was faithfully reporting state captured while the
+paths were still broken. A running session will never notice a plugin config
+repair.
+
+The way to check the real state without killing the session is to ask a fresh
+process:
+
+```sh
+claude plugin list
+```
+
+That spawns a new process which re-resolves everything from disk. It reported
+all ten as `✔ enabled` with zero failures, which confirmed the repair.
+`claude plugin` also offers `details`, `enable`, and `disable` subcommands, and
+is generally the way to inspect plugin state out of band.
+
+The broader habit: when verifying a fix to anything Claude Code reads at
+startup, hooks, settings, plugins, MCP servers, treat in-session slash command
+output as a stale cache and reach for a fresh process or a restart.
+
+Investigating the false alarm did surface a genuine design detail. The ten LSP
+plugins, alone among the marketplace's forty-one, ship as bare directories with
+no `.claude-plugin/plugin.json`. That is deliberate, and it is declared: every
+one of them carries `"strict": false` in `marketplace.json` alongside its
+`lspServers` block. The `strict: false` flag is what permits a plugin directory
+to omit a manifest and take its metadata from the marketplace entry instead. So
+a bare plugin directory is only suspicious if the marketplace entry is missing
+that flag.
+
 ## Lessons
 
 The generalisable finding is that **Claude Code's plugin state stores absolute
