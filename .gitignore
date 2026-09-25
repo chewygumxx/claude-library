@@ -1,0 +1,11 @@
+# The global ignore at ~/.config/git/ignore excludes .claude/ wholesale, which
+# is sensible for ordinary projects but wrong here: this repository exists to
+# keep Claude Code configuration under version control, and CLAUDE.md requires
+# that none of its documentation be ignored by git configuration. A repository
+# .gitignore takes precedence over core.excludesFile, so this negation wins.
+!.claude/
+
+# Transient worktrees. Each is a full checkout of this repository, so committing
+# one would nest the repo inside itself. Listed after the negation above because
+# git applies the last matching pattern.
+.claude/worktrees/
