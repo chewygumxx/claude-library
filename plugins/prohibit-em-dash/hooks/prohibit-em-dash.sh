@@ -81,8 +81,9 @@ cmd_exists() {
         fi
     done
 
-    ((${#not_found[@]} > 0)) &&
+    if ((${#not_found[@]} > 0)); then
         fatal "Command not found: ${not_found[*]}"
+    fi
 }
 
 require_jq_version() {
