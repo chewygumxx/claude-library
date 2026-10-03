@@ -50,5 +50,6 @@
                 "path": "."
             }
         }
-    }
+    },
+    "autoMemoryDirectory": "/home/chewygumxx/dev/claude-library/.claude/memory"
 }
