@@ -4,15 +4,10 @@
 #
 #
 # ~chewygumxx/claude-library.git
-# ::: :/.gitignore
+# ::: :/.worktreeinclude
 #
 #
 
 .env*
 *.local.*
-
-node_modules/
-
-/.herdr/
-/.claude/worktrees/
-
+/node_modules/
