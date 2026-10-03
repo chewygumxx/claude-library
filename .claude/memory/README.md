@@ -15,13 +15,12 @@ This directory holds Claude Code's auto memory for this repository, a
 (user preferences, corrections, project context, references).
 
 It is pinned here, rather than left at the default
-`~/.claude/projects/<project>/memory/`, via `autoMemoryDirectory` in
-`.claude/settings.json`, so these files are git-tracked alongside the rest
-of the repository instead of scattered under the home directory. A
-`SessionStart` hook in that same settings file keeps `autoMemoryDirectory`
-in sync with this repository's current absolute path on disk, so the
-pinning survives a clone or move. See
-`notes/2026-09-03-repo-local-auto-memory.md` for the full rationale.
+`~/.claude/projects/<project>/memory/`, so these files are git-tracked
+alongside the rest of the repository instead of scattered under the home
+directory. The `repo-memory` plugin's `SessionStart` hook sets
+`autoMemoryDirectory` to this directory's absolute path in the git ignored
+`.claude/settings.local.json`, so the pinning follows every clone, move or
+worktree without committing a machine-specific path.
 
 Files here are plain markdown, Claude reads and writes them during a
 session; review or edit them at any time via `/memory`.

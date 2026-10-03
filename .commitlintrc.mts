@@ -27,6 +27,12 @@ export default defineConfig({
                 "Plugin: PreToolUse hook on Write|Edit to prohibit em dashes",
         },
         {
+            name: "repo-memory",
+            fullName: "Repo Memory",
+            description:
+                "Plugin: SessionStart hook to pin autoMemoryDirectory locally",
+        },
+        {
             name: "repo-metadata",
             fullName: ".repo-metadata.jsonc",
             description: "Plugin: Rule",

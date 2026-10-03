@@ -17,15 +17,6 @@
                         ],
                         "timeout": 120,
                         "statusMessage": "Installing dependencies"
-                    },
-                    {
-                        "type": "command",
-                        "command": "bash",
-                        "args": [
-                            "${CLAUDE_PROJECT_DIR}/.claude/hooks/sync-auto-memory-dir.sh"
-                        ],
-                        "timeout": 10,
-                        "statusMessage": "Synchronising autoMemoryDirectory"
                     }
                 ]
             }
@@ -41,7 +32,8 @@
         "remember@claude-plugins-official": true,
         "superpowers@claude-plugins-official": true,
         "typescript-lsp@claude-plugins-official": true,
-        "prohibit-em-dash@chewygumxx": true
+        "prohibit-em-dash@chewygumxx": true,
+        "repo-memory@chewygumxx": true
     },
     "extraKnownMarketplaces": {
         "chewygumxx": {
@@ -50,6 +42,5 @@
                 "path": "."
             }
         }
-    },
-    "autoMemoryDirectory": "/home/chewygumxx/dev/claude-library/.claude/memory"
+    }
 }

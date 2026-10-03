@@ -12,6 +12,10 @@
         {
             "name": "prohibit-em-dash",
             "source": "./plugins/prohibit-em-dash"
+        },
+        {
+            "name": "repo-memory",
+            "source": "./plugins/repo-memory"
         }
     ]
 }
