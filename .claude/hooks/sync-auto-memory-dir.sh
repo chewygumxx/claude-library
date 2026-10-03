@@ -23,5 +23,5 @@ settings="$root/.claude/settings.json"
 cur="$(jq -r '.autoMemoryDirectory // empty' "$settings")"
 if [[ "$cur" != "$dir" ]]; then
     tmp="$settings.tmp"
-    jq --arg d "$dir" '.autoMemoryDirectory = $d' "$settings" >"$tmp" && mv "$tmp" "$settings"
+    jq --indent 4 --arg d "$dir" '.autoMemoryDirectory = $d' "$settings" >"$tmp" && mv "$tmp" "$settings"
 fi
