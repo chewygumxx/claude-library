@@ -1,0 +1,37 @@
+{
+    "hooks": {
+        "PostToolUse": [
+            {
+                "matcher": "Read",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "if": "Read(.repo-metadata.jsonc)",
+                        "command": "sh",
+                        "args": [
+                            "${CLAUDE_PLUGIN_ROOT}/hooks/remind.sh",
+                            "${CLAUDE_PLUGIN_ROOT}/hooks/repo-metadata.md"
+                        ],
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "if": "Bash(gh repo edit *)",
+                        "command": "bash",
+                        "args": [
+                            "${CLAUDE_PLUGIN_ROOT}/hooks/deny-gh-repo-edit.sh"
+                        ],
+                        "timeout": 10
+                    }
+                ]
+            }
+        ]
+    }
+}

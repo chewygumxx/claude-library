@@ -6,19 +6,12 @@ __cgxx: |
   #
   #
   # ~chewygumxx/claude-library.git
-  # ::: :/plugins/repo-metadata/skills/repo-metadata/SKILL.md
+  # ::: :/plugins/repo-metadata/hooks/repo-metadata.md
   #
   #
 
 ctime: 2026-09-27
 title: Repository metadata
-description: >-
-  Use when editing .repo-metadata.jsonc, or when asked to change a GitHub
-  repository's description, topics or licence. CI applies that file to GitHub
-  on every push to main, so those settings are edited there, not on GitHub.
-paths:
-  - ".repo-metadata.jsonc"
-user-invocable: false
 tags:
   - llm
   - claude

@@ -1,7 +1,7 @@
 {
     "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
     "name": "repo-metadata",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "displayName": "Repo Metadata",
     "description": "Tells the agent that .repo-metadata.jsonc, applied by CI on every push to main, is where a repository's GitHub description, topics and licence are edited, since changes made on GitHub are silently reverted.",
     "author": {
@@ -11,6 +11,7 @@
     },
     "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/repo-metadata",
     "license": "GPL-3.0-only",
-    "keywords": ["skills", "github", "metadata"],
-    "defaultEnabled": true
+    "keywords": ["hooks", "github", "metadata"],
+    "defaultEnabled": true,
+    "hooks": "./hooks/hooks.json"
 }

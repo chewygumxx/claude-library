@@ -42,7 +42,7 @@ export default defineConfig({
             name: "repo-metadata",
             fullName: "Repo Metadata",
             description:
-                "Plugin: Skill on editing GitHub settings via .repo-metadata.jsonc",
+                "Plugin: Hooks on editing GitHub settings via .repo-metadata.jsonc",
         },
     ],
 });

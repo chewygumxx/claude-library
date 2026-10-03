@@ -22,7 +22,7 @@ tags:
   - claude-code
   - claude-plugin
   - claude-library
-  - skills
+  - hooks
   - github
 ---
 
@@ -32,8 +32,16 @@ Tells the agent that `.repo-metadata.jsonc`, applied by CI on every push to
 `main`, is where a repository's GitHub description, topics and licence are
 edited, since changes made on GitHub are silently reverted.
 
-Plugins cannot ship `.claude/rules/`, so this was a path-scoped rule and is now
-a skill with the same `paths` glob. It loads automatically when the agent works
-with `.repo-metadata.jsonc`, and its description also lets the agent load it
-when asked to change those GitHub settings without touching the file. It is
-hidden from the `/` menu (`user-invocable: false`), as background knowledge.
+Plugins cannot ship `.claude/rules/`, and a skill's description sits in context
+every session, wanted or not. Two hooks, each gated by an `if` filter so no
+process runs until a matching tool call, replace the rule at no standing token
+cost:
+
+- `PostToolUse` on `Read(.repo-metadata.jsonc)` adds
+  [`hooks/repo-metadata.md`](hooks/repo-metadata.md) to Claude's context, as a
+  path-scoped rule would when the file is read
+- `PreToolUse` on `Bash(gh repo edit *)` denies changing the description,
+  topics or default branch in a project with a `.repo-metadata.jsonc`, and
+  points Claude at the file instead
+
+Requires `jq`.
