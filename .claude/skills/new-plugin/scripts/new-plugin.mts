@@ -39,7 +39,9 @@ Optional:
   --disabled                 Set defaultEnabled to false
   --help                     Show this message`;
 
-const TODAY = new Date().toISOString().slice(0, 10);
+// The local date, as toISOString() gives UTC's: a day behind east of
+// Greenwich until UTC's midnight.
+const TODAY = new Date().toLocaleDateString("sv-SE");
 const WIDTH = 80;
 
 const { values: options } = parseArgs({
