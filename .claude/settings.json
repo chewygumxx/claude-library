@@ -1,20 +1,61 @@
 {
-  "$schema": "https://www.schemastore.org/claude-code-settings.json",
-  "autoMemoryDirectory": "/home/chewygum/dev/claude-library/.claude/memory",
-  "env": {
-    "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1"
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/sync-auto-memory-dir.sh",
-            "args": []
-          }
+    "$schema": "https://www.schemastore.org/claude-code-settings.json",
+    "attribution": {
+        "commit": "",
+        "pr": "",
+        "sessionUrl": false
+    },
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash",
+                        "args": [
+                            "${CLAUDE_PROJECT_DIR}/.claude/hooks/install-deps.sh"
+                        ],
+                        "timeout": 120,
+                        "statusMessage": "Installing dependencies"
+                    },
+                    {
+                        "type": "command",
+                        "command": "bash",
+                        "args": [
+                            "${CLAUDE_PROJECT_DIR}/.claude/hooks/sync-auto-memory-dir.sh"
+                        ],
+                        "timeout": 10,
+                        "statusMessage": "Synchronising autoMemoryDirectory"
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Write|Edit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash",
+                        "args": [
+                            "${CLAUDE_PROJECT_DIR}/.claude/hooks/prohibit-em-dash.sh"
+                        ],
+                        "timeout": 10,
+                        "statusMessage": "Checking for em dashes"
+                    }
+                ]
+            }
         ]
-      }
-    ]
-  }
+    },
+    "enabledPlugins": {
+        "agent-sdk-dev@claude-plugins-official": true,
+        "claude-code-setup@claude-plugins-official": true,
+        "claude-md-management@claude-plugins-official": true,
+        "code-review@claude-plugins-official": true,
+        "code-simplifier@claude-plugins-official": true,
+        "explanatory-output-style@claude-plugins-official": true,
+        "remember@claude-plugins-official": true,
+        "superpowers@claude-plugins-official": true,
+        "typescript-lsp@claude-plugins-official": true
+    }
 }
