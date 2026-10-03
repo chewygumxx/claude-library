@@ -1,0 +1,16 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    "name": "prohibit-em-dash",
+    "displayName": "Prohibit Em Dash",
+    "description": "Parses any file an agent writes or edits within the project directory for em dashes. No em dashes, exits 0. Otherwise, exits 2 with line numbers of em dash locations.",
+    "author": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/prohibit-em-dash",
+    "license": "GPL-3.0-only",
+    "keywords": ["hooks", "linter", "em-dash"],
+    "defaultEnabled": true,
+    "hooks": "./hooks/hooks.json"
+}
