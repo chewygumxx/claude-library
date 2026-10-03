@@ -29,3 +29,16 @@ insert_final_newline = true
 # ---------
 [*.md]
 indent_size = 2
+
+# ------
+# Shell
+# ------
+# shfmt's own section, matching shell scripts by shebang as well as by
+# extension, so git hooks without one are included. Its defaults, stated so
+# they are not left to whichever shfmt runs.
+[[shell]]
+binary_next_line = false
+function_next_line = false
+keep_padding = false
+space_redirects = false
+switch_case_indent = false

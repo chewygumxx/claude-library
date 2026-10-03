@@ -35,10 +35,19 @@ bun = "1.4"
 #
 # Utilities
 #
-# `jq` parses the tool payload in the `prohibit-em-dash` plugin hook, and
+# `jq` parses tool payloads and writes hook output in the plugin hooks, and
 # edits local settings in the `repo-memory` plugin hook.
 #
 "aqua:jqlang/jq" = "1"
+
+#
+# Shell
+#
+# The plugin hooks and git hooks are shell scripts. shellcheck reads
+# `.shellcheckrc`; shfmt has no file of its own and reads `.editorconfig`.
+#
+"aqua:koalaman/shellcheck" = "0.11.0"
+"aqua:mvdan/sh"            = "3.14.1"
 
 #
 # YAML

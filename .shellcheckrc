@@ -1,0 +1,28 @@
+# vim:set expandtab shiftwidth=4 filetype=conf:
+# SPDX-License-Identifier: GPL-3.0-only
+
+#
+#
+# ~chewygumxx/claude-library.git
+# ::: :/.shellcheckrc
+#
+#
+
+#
+# https://github.com/koalaman/shellcheck/wiki/Directive
+#
+# Every check shellcheck runs by default, plus the optional checks that catch
+# mistakes rather than enforce a style. Brace and set -e suppression checks
+# are left off: both flag the idiomatic code the plugin hooks are written in.
+#
+
+enable=add-default-case
+enable=avoid-nullary-conditions
+enable=check-extra-masked-returns
+enable=check-unassigned-uppercase
+enable=deprecate-which
+enable=quote-safe-variables
+enable=require-double-brackets
+
+external-sources=true
+source-path=SCRIPTDIR
