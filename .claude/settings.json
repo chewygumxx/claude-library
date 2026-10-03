@@ -29,22 +29,6 @@
                     }
                 ]
             }
-        ],
-        "PostToolUse": [
-            {
-                "matcher": "Write|Edit",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash",
-                        "args": [
-                            "${CLAUDE_PROJECT_DIR}/.claude/hooks/prohibit-em-dash.sh"
-                        ],
-                        "timeout": 10,
-                        "statusMessage": "Checking for em dashes"
-                    }
-                ]
-            }
         ]
     },
     "enabledPlugins": {
@@ -56,6 +40,15 @@
         "explanatory-output-style@claude-plugins-official": true,
         "remember@claude-plugins-official": true,
         "superpowers@claude-plugins-official": true,
-        "typescript-lsp@claude-plugins-official": true
+        "typescript-lsp@claude-plugins-official": true,
+        "prohibit-em-dash@chewygumxx": true
+    },
+    "extraKnownMarketplaces": {
+        "chewygumxx": {
+            "source": {
+                "source": "directory",
+                "path": "."
+            }
+        }
     }
 }
