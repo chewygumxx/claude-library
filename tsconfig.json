@@ -11,5 +11,5 @@
         "types": ["bun"],
         "skipLibCheck": true
     },
-    "include": [".commitlintrc.mts"]
+    "include": [".commitlintrc.mts", ".claude/skills/*/scripts/*.mts"]
 }

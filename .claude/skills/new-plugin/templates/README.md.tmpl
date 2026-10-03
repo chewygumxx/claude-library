@@ -1,0 +1,33 @@
+# vim:set expandtab shiftwidth=2 filetype=markdown:
+# SPDX-License-Identifier: GPL-3.0-only
+
+#
+#
+# ~chewygumxx/claude-library.git
+# ::: :/.claude/skills/new-plugin/templates/README.md.tmpl
+#
+#
+
+# A plugin's README.md. new-plugin.mts drops this leading comment block, then
+# fills each {{placeholder}}.
+
+---
+__cgxx: |
+{{banner}}
+
+ctime: {{date}}
+title: "{{displayName}}: README.md"
+description: >-
+{{descriptionFolded}}
+tags:
+  - llm
+  - claude
+  - claude-code
+  - claude-plugin
+  - claude-library
+{{tags}}
+---
+
+# {{displayName}}
+
+{{descriptionWrapped}}
