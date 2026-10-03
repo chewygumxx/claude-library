@@ -21,14 +21,14 @@ set -eu
 #     2  Findings: the edit stands, and shellcheck's report goes to Claude
 #
 # Files outside the project are left alone, and each tool is skipped when it
-# is not on PATH. shfmt reads the project's .editorconfig and shellcheck its
+# does not run, such as a mise shim with no version set for the project. shfmt reads the project's .editorconfig and shellcheck its
 # .shellcheckrc, so both follow the project's own settings.
 
 command -v jq >/dev/null 2>&1 || {
     echo 'shell-lint: Command not found: jq' >&2
     exit 1
 }
-command -v shfmt >/dev/null 2>&1 || exit 0
+shfmt --version >/dev/null 2>&1 || exit 0
 
 file=$(jq -r '.tool_input.file_path // empty')
 [ -n "${file}" ] && [ -f "${file}" ] || exit 0
@@ -50,7 +50,7 @@ if ! shfmt -d "${file}" >/dev/null 2>&1; then
     fi
 fi
 
-if command -v shellcheck >/dev/null 2>&1; then
+if shellcheck --version >/dev/null 2>&1; then
     if ! findings=$(shellcheck -f gcc "${file}" 2>&1); then
         report=${report:+${report}
 }${findings}

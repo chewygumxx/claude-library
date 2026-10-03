@@ -47,6 +47,7 @@ which an `if` filter on the path could not do. Then:
 The hook does nothing when any of these hold:
 
 - The file is outside the project, or is not a shell script
-- `shfmt` is not on `PATH`; without `shellcheck`, it only formats
+- `shfmt` does not run, as when it is not on `PATH` or is a mise shim with no
+  version set for the project; without `shellcheck`, it only formats
 
 Requires `jq`.
