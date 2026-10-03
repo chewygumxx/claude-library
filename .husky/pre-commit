@@ -27,6 +27,17 @@ git diff -z --cached --name-only --diff-filter=ACMR -- '*.toml' |
 git diff -z --cached --name-only --diff-filter=ACMR -- '*.toml' |
     xargs -0 -r tombi lint --error-on-warnings
 
+# Shell scripts are found by shebang as well as extension, as git hooks have
+# none. shfmt -f prints one per line, so newlines are turned back into NULs.
+git diff -z --cached --name-only --diff-filter=ACMR | xargs -0 -r shfmt -f |
+    tr '\n' '\0' | xargs -0 -r shfmt -d
+git diff -z --cached --name-only --diff-filter=ACMR | xargs -0 -r shfmt -f |
+    tr '\n' '\0' | xargs -0 -r shellcheck
+
+if ! git diff --cached --quiet -- .claude-plugin plugins; then
+    mise run --quiet lint:plugins
+fi
+
 # U+2014 as UTF-8 bytes, so this file does not trip its own check. Colour,
 # external diff drivers and textconv filters are disabled: each can hide the
 # leading "+" or rewrite the em dash, such as a JSON textconv to "\u2014".
