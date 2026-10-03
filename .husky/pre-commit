@@ -34,7 +34,7 @@ git diff -z --cached --name-only --diff-filter=ACMR | xargs -0 -r shfmt -f |
 git diff -z --cached --name-only --diff-filter=ACMR | xargs -0 -r shfmt -f |
     tr '\n' '\0' | xargs -0 -r shellcheck
 
-if ! git diff --cached --quiet -- .claude-plugin plugins; then
+if ! git diff --cached --quiet -- .claude-plugin .claude/agents .claude/skills plugins; then
     mise run --quiet lint:plugins
 fi
 

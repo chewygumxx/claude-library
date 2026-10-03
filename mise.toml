@@ -66,10 +66,10 @@ bun = "1.4"
 # `[tools]`, so mise does not put it ahead of the contributor's own `claude`
 # on `PATH` in this directory. A report is printed only when it fails.
 #
-description = "Validate the marketplace and every plugin"
+description = "Validate the marketplace, every plugin and .claude"
 tools       = { "aqua:anthropics/claude-code" = "2" }
 run         = """
-for target in . plugins/*/; do
+for target in . .claude plugins/*/; do
     report=$(claude plugin validate --strict "$target") || {
         printf '%s\n' "$report" >&2
         exit 1
