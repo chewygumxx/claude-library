@@ -61,10 +61,14 @@ on a matching call, and that they do not fire on a near miss:
 claude -p --plugin-dir <plugin> --setting-sources project \
     --permission-mode acceptEdits --model haiku --max-turns 3 \
     --output-format stream-json --verbose --include-hook-events \
-    '<a prompt that makes exactly the tool call to test>' >"$tmp/run.jsonl"
-jq -c 'select(.subtype == "hook_response")
-    | {hook_event, exit_code, stdout, stderr}' "$tmp/run.jsonl"
+    '<a prompt that makes exactly the tool call to test>' \
+    </dev/null >"$tmp/run.jsonl"
+grep '^{' "$tmp/run.jsonl" | jq -c 'select(.subtype == "hook_response")
+    | {hook_event, exit_code, output, stdout, stderr}'
 ```
+
+Without `</dev/null`, `claude -p` waits for stdin and prints a warning
+ahead of the JSON, which the `grep` drops.
 
 Run it from a temporary project, so neither this repository's settings nor
 its other plugins interfere. A `hook_response` for the event is the evidence
