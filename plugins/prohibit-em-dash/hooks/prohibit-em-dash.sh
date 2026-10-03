@@ -99,7 +99,7 @@ require_jq_version() {
         fatal "jq $JQ_MIN_VERSION or newer is required; found jq $installed_version."
 }
 
-# Prints nothing or NUL terminated filepath, newline included.
+# Prints the edited file path terminated by a NUL, or nothing.
 print_edited_filepath() {
     jq --raw-output0 '.tool_input.file_path // empty'
 }
