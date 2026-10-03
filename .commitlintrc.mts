@@ -15,12 +15,6 @@ import { defineConfig } from "@chewygumxx/commitlint-config";
 export default defineConfig({
     scopes: [
         {
-            name: "claude",
-            fullName: "Claude",
-            description:
-                "Project Claude Code config within /.claude/* (settings, memory, etc.)",
-        },
-        {
             name: "bun-install",
             fullName: "Bun Install",
             description:
