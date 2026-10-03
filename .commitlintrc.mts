@@ -24,11 +24,11 @@ export default defineConfig({
             name: "prohibit-em-dash",
             fullName: "Prohibit Em Dash",
             description:
-                "Plugin: PostToolUse hook on Write|Edit to prohibt em dashes",
+                "Plugin: PostToolUse hook on Write|Edit to prohibit em dashes",
         },
         {
             name: "repo-metadata",
-            fullName: ".repo-metadata.json",
+            fullName: ".repo-metadata.jsonc",
             description: "Plugin: Rule",
         },
     ],
