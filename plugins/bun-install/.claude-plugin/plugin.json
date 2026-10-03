@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    "name": "bun-install",
+    "version": "0.0.1",
+    "displayName": "Bun Install",
+    "description": "At the start of a remote (cloud) session, installs the project's dependencies with bun install --frozen-lockfile, when the project has a Bun lockfile.",
+    "author": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/bun-install",
+    "license": "GPL-3.0-only",
+    "keywords": ["hooks", "bun", "dependencies", "remote"],
+    "defaultEnabled": true,
+    "hooks": "./hooks/hooks.json"
+}

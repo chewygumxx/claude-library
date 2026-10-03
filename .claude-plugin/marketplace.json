@@ -10,6 +10,10 @@
     },
     "plugins": [
         {
+            "name": "bun-install",
+            "source": "./plugins/bun-install"
+        },
+        {
             "name": "prohibit-em-dash",
             "source": "./plugins/prohibit-em-dash"
         },

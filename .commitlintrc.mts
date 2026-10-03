@@ -21,6 +21,12 @@ export default defineConfig({
                 "Claude Code assets within /.claude/* (hooks, skills, agents, etc.)",
         },
         {
+            name: "bun-install",
+            fullName: "Bun Install",
+            description:
+                "Plugin: SessionStart hook to bun install in remote sessions",
+        },
+        {
             name: "prohibit-em-dash",
             fullName: "Prohibit Em Dash",
             description:

@@ -1,0 +1,17 @@
+{
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "sh",
+                        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/bun-install.sh"],
+                        "timeout": 120,
+                        "statusMessage": "Installing dependencies"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -5,12 +5,14 @@
 #
 #
 # ~chewygumxx/claude-library.git
-# ::: :/.claude/hooks/install-deps.sh
+# ::: :/plugins/bun-install/hooks/bun-install.sh
 #
 #
 
-# SessionStart. Installs this repository's dependencies, with Bun, so husky's
-# git hooks are wired before anything else in the session runs.
+# SessionStart. In remote (cloud) sessions, which start from a fresh checkout,
+# installs the project's dependencies with Bun from its lockfile, so lifecycle
+# scripts such as husky's git hook wiring run before anything else in the
+# session. Local sessions, and projects without a Bun lockfile, are skipped.
 
 set -u
 
@@ -21,6 +23,7 @@ root=${CLAUDE_PROJECT_DIR:-}
 [ -n "$root" ] || exit 0
 
 [ -f "$root/package.json" ] || exit 0
+[ -f "$root/bun.lock" ] || [ -f "$root/bun.lockb" ] || exit 0
 command -v bun >/dev/null 2>&1 || exit 0
 
 cd "$root" || exit 0
