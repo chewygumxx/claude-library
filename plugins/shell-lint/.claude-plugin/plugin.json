@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    "name": "shell-lint",
+    "version": "0.0.1",
+    "displayName": "Shell Lint",
+    "description": "After Claude writes or edits a shell script, found by shebang as well as extension, formats it with shfmt and reports shellcheck's findings back to Claude.",
+    "author": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/shell-lint",
+    "license": "GPL-3.0-only",
+    "keywords": ["hooks", "shell", "shellcheck", "shfmt"],
+    "defaultEnabled": true,
+    "hooks": "./hooks/hooks.json"
+}

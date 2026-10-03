@@ -44,5 +44,11 @@ export default defineConfig({
             description:
                 "Plugin: Hooks on editing GitHub settings via .repo-metadata.jsonc",
         },
+        {
+            name: "shell-lint",
+            fullName: "Shell Lint",
+            description:
+                "Plugin: PostToolUse hook to shfmt and shellcheck scripts",
+        },
     ],
 });

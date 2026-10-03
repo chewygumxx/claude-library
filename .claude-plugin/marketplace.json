@@ -24,6 +24,10 @@
         {
             "name": "repo-metadata",
             "source": "./plugins/repo-metadata"
+        },
+        {
+            "name": "shell-lint",
+            "source": "./plugins/shell-lint"
         }
     ]
 }

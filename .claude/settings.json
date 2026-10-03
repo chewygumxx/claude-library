@@ -16,7 +16,8 @@
         "prohibit-em-dash@chewygumxx": true,
         "repo-memory@chewygumxx": true,
         "bun-install@chewygumxx": true,
-        "repo-metadata@chewygumxx": true
+        "repo-metadata@chewygumxx": true,
+        "shell-lint@chewygumxx": true
     },
     "extraKnownMarketplaces": {
         "chewygumxx": {
