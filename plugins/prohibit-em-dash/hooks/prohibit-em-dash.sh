@@ -140,7 +140,7 @@ report_em_dashes() {
 }
 
 main() {
-    validate_deps jq grep realpath
+    cmd_exists jq grep realpath
     require_jq_version
 
     [[ -n "${CLAUDE_PROJECT_DIR:-}" ]] ||
