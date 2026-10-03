@@ -1,0 +1,17 @@
+{
+    "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+    "name": "chewygumxx",
+    "version": "0.0.1",
+    "description": "My personal Claude Code plugins",
+    "owner": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "plugins": [
+        {
+            "name": "prohibit-em-dash",
+            "source": "./plugins/prohibit-em-dash"
+        }
+    ]
+}
