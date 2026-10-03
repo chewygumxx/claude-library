@@ -13,9 +13,9 @@ __cgxx: |
 ctime: 2026-10-03
 title: "Prohibit Em Dash: README.md"
 description: >-
-  Parses any file an agent writes or edits within the project directory for em
-  dashes. No em dashes, exits 0. Otherwise, exits 2 with line numbers of em
-  dash locations.
+  Blocks any write or edit within the project directory whose proposed text
+  contains an em dash, and tells the agent which lines to rewrite. Em dashes
+  already in a file do not block.
 tags:
   - llm
   - claude
@@ -29,6 +29,12 @@ tags:
 
 # Prohibit Em Dash
 
-Parses any file an agent writes or edits within the project directory for em
-dashes. No em dashes, exits 0. Otherwise, exits 2 with line numbers of em dash
-locations.
+Blocks any write or edit within the project directory whose proposed text
+contains an em dash, and tells the agent which lines to rewrite. Em dashes
+already in a file do not block.
+
+A `PreToolUse` hook on `Write|Edit` checks `tool_input.content` (Write) or
+`tool_input.new_string` (Edit) before the tool runs. A match exits 2, which
+blocks the call and returns the offending line numbers, counted within that
+proposed text, to the agent. Checking the proposed text rather than the whole
+file mirrors a pre-commit check of added lines only.

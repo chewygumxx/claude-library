@@ -9,13 +9,15 @@
 #
 #
 
-# Claude Code PostToolUse hook on Write|Edit. Rejects any file within project
-# directory that contains an em dash (U+2014) and informs Claude which lines to fix.
+# Claude Code PreToolUse hook on Write|Edit. Blocks any write or edit within the
+# project directory whose proposed text (Write's content, Edit's new_string)
+# contains an em dash (U+2014), and informs Claude which lines to fix. Only the
+# text being introduced is checked, so em dashes already in a file do not block.
 #
 # Exit status follows the hook contract:
 #     0  Valid
 #     1  Execution Error (non-blocking, user viewable)
-#     2  Em Dash Found: Line number printed to stderr
+#     2  Em Dash Found: Tool call blocked, line numbers printed to stderr
 
 if [ -z "${BASH_VERSION:-}" ]; then
     echo 'prohibit-em-dash: This hook requires Bash.' >&2
@@ -99,9 +101,31 @@ require_jq_version() {
         fatal "jq $JQ_MIN_VERSION or newer is required; found jq $installed_version."
 }
 
-# Prints the edited file path terminated by a NUL, or nothing.
-print_edited_filepath() {
-    jq --raw-output0 '.tool_input.file_path // empty'
+# Prints three NUL-terminated fields from the tool payload: the target file
+# path, the name of the field holding the proposed text, and that text.
+print_tool_input_fields() {
+    jq --raw-output0 '
+        (.tool_input // {})
+        | (.file_path // ""),
+          (if has("content") then "content" else "new_string" end),
+          (.content // .new_string // "")'
+}
+
+# Prints path $1 resolved, even when it or some of its parent directories do
+# not yet exist (a Write creating a new file), by resolving its nearest
+# existing ancestor and appending the remainder.
+resolve_path() {
+    local path="$1" remainder="" resolved_ancestor
+    [[ $path == /* ]] || path="$PWD/$path"
+
+    until [[ -e $path ]]; do
+        remainder="/${path##*/}$remainder"
+        path=${path%/*}
+        [[ -n $path ]] || path=/
+    done
+
+    resolved_ancestor=$(realpath -- "$path") || return
+    printf '%s%s\n' "${resolved_ancestor%/}" "$remainder"
 }
 
 # Succeeds when path $1, once resolved, lies beneath the already-resolved
@@ -109,23 +133,23 @@ print_edited_filepath() {
 # defeating prefix comparison.
 is_beneath_directory() {
     local resolved_path
-    resolved_path=$(realpath -- "$1") || return
+    resolved_path=$(resolve_path "$1") || return
     [[ $resolved_path == "$2"/* ]]
 }
 
-# Prints the comma-separated numbers of the lines in $1 holding an em dash.
-# Returns grep's status: 0 found, 1 none (or a binary file), 2 error.
+# Prints the comma-separated numbers of the lines in text $1 holding an em
+# dash. Returns grep's status: 0 found, 1 none, 2 error.
 list_em_dash_lines() {
-    local matches joined_line_numbers filepath="$1"
+    local matches joined_line_numbers text="$1"
     local -a matching_lines=()
 
-    # LC_ALL=C prevents locale and non-UTF-8 byte interference
-    # compelling grep to classify a text file as binary and skip it.
+    # LC_ALL=C prevents locale and non-UTF-8 byte interference from
+    # compelling grep to classify the text as binary.
     matches=$(LC_ALL=C grep \
-        --binary-files=without-match \
+        --text \
         --fixed-strings \
         --line-number \
-        -- "$EM_DASH" "$filepath") || return
+        -- "$EM_DASH" <<<"$text") || return
 
     mapfile -t matching_lines <<<"$matches"
     printf -v joined_line_numbers '%s, ' "${matching_lines[@]%%:*}"
@@ -133,10 +157,10 @@ list_em_dash_lines() {
 }
 
 report_em_dashes() {
-    local -r file_path="$1" line_numbers="$2"
+    local -r file_path="$1" field="$2" line_numbers="$3"
     printf '%s\n' \
-        "Em dash (U+2014) found in: $file_path on line(s) $line_numbers." \
-        'Em dashes are prohibited in this repository; rewrite those lines without them.' \
+        "Em dash (U+2014) found in $file_path: line(s) $line_numbers of the proposed $field." \
+        'Em dashes are prohibited in this repository; rewrite those lines without them and retry.' \
         >&2
 }
 
@@ -151,24 +175,27 @@ main() {
     project_root=$(realpath -- "$CLAUDE_PROJECT_DIR" 2>/dev/null) ||
         fatal "Unable to resolve CLAUDE_PROJECT_DIR: $CLAUDE_PROJECT_DIR"
 
-    local file_path
-    IFS= read -r -d '' file_path < <(print_edited_filepath) || return 0
-    [[ -f "$file_path" ]] || return 0
+    local -a fields=()
+    mapfile -d '' -t fields < <(print_tool_input_fields)
+    ((${#fields[@]} == 3)) || fatal "Unable to parse the tool payload."
+
+    local -r file_path="${fields[0]}" field="${fields[1]}" text="${fields[2]}"
+    [[ -n "$file_path" ]] || return 0
     is_beneath_directory "$file_path" "$project_root" || return 0
 
     local em_dash_lines grep_status=0
-    em_dash_lines=$(list_em_dash_lines "$file_path") || grep_status=$?
+    em_dash_lines=$(list_em_dash_lines "$text") || grep_status=$?
 
     case $grep_status in
     0)
-        report_em_dashes "$file_path" "$em_dash_lines"
+        report_em_dashes "$file_path" "$field" "$em_dash_lines"
         exit 2
         ;;
     1)
         return 0
         ;;
     *)
-        fatal "grep failed to parse $file_path (exit code: $grep_status)."
+        fatal "grep failed to parse the $field for $file_path (exit code: $grep_status)."
         ;;
     esac
 }

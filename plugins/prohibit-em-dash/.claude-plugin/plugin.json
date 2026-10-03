@@ -1,9 +1,9 @@
 {
     "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
     "name": "prohibit-em-dash",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "displayName": "Prohibit Em Dash",
-    "description": "Parses any file an agent writes or edits within the project directory for em dashes. No em dashes, exits 0. Otherwise, exits 2 with line numbers of em dash locations.",
+    "description": "Blocks any write or edit within the project directory whose proposed text contains an em dash, and tells the agent which lines to rewrite. Em dashes already in a file do not block.",
     "author": {
         "name": "chewygumxx",
         "email": "cgumxx@pm.me",

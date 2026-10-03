@@ -24,7 +24,7 @@ export default defineConfig({
             name: "prohibit-em-dash",
             fullName: "Prohibit Em Dash",
             description:
-                "Plugin: PostToolUse hook on Write|Edit to prohibit em dashes",
+                "Plugin: PreToolUse hook on Write|Edit to prohibit em dashes",
         },
         {
             name: "repo-metadata",
