@@ -26,8 +26,9 @@ context, include such within the commit message body.
 
 Commit messages are checked by commitlint: a header of at most 50 characters,
 as `type(scope): Sentence-case subject`, and body lines of at most 72. Scopes
-are those in `.commitlintrc.mts`, one per plugin plus `claude` for `.claude/`;
-omit the scope for repository-wide changes.
+are those in `.commitlintrc.mts`, one per plugin, and are omitted for changes
+beyond a single plugin. Changes to the project's own Claude Code assets in
+`.claude/` take the `ai` type, unscoped, as `ai: Subject`.
 
 When appropriate and worthwhile to compact, append the following
 newline-delimited items to your response:

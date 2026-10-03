@@ -277,7 +277,7 @@ await editJson<Settings>(".claude/settings.json", (json) => {
     json.enabledPlugins[`${name}@${marketplace.name}`] = true;
 });
 
-// The commitlint scope, after "claude" and among the plugins by name.
+// The commitlint scope, among the plugins by name.
 const commitlintPath = ".commitlintrc.mts";
 const commitlint = await readFile(commitlintPath, "utf8");
 const entry = `        {
@@ -287,9 +287,7 @@ const entry = `        {
         },
 `;
 const entries = [...commitlint.matchAll(/^ {8}\{\n {12}name: "([^"]+)"/gm)];
-const next = entries.find(
-    (match) => match[1] !== "claude" && (match[1] ?? "") > name,
-);
+const next = entries.find((match) => (match[1] ?? "") > name);
 const insertAt = next?.index ?? commitlint.indexOf("    ],\n});");
 if (insertAt < 0) {
     fail(`${commitlintPath}: No scopes array found.`);
