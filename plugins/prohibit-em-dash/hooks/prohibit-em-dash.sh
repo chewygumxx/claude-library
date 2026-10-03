@@ -19,6 +19,8 @@
 #     1  Execution Error (non-blocking, user viewable)
 #     2  Em Dash Found: Tool call blocked, line numbers printed to stderr
 
+# POSIX test, as this guard must run in whichever shell started the script.
+# shellcheck disable=SC2292
 if [ -z "${BASH_VERSION:-}" ]; then
     echo 'prohibit-em-dash: This hook requires Bash.' >&2
     exit 1
@@ -175,7 +177,9 @@ main() {
     project_root=$(realpath -- "$CLAUDE_PROJECT_DIR" 2>/dev/null) ||
         fatal "Unable to resolve CLAUDE_PROJECT_DIR: $CLAUDE_PROJECT_DIR"
 
+    # A failed jq yields too few fields, which the count below catches.
     local -a fields=()
+    # shellcheck disable=SC2312
     mapfile -d '' -t fields < <(print_tool_input_fields)
     ((${#fields[@]} == 3)) || fatal "Unable to parse the tool payload."
 
