@@ -19,7 +19,8 @@
         "bun-install@chewygumxx": true,
         "repo-metadata@chewygumxx": true,
         "shell-lint@chewygumxx": true,
-        "plugin-lint@chewygumxx": true
+        "plugin-lint@chewygumxx": true,
+        "header-metadata@chewygumxx": true
     },
     "extraKnownMarketplaces": {
         "chewygumxx": {

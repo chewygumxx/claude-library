@@ -35,8 +35,9 @@ bun = "1.4"
 #
 # Utilities
 #
-# `jq` parses tool payloads and writes hook output in the plugin hooks, and
-# edits local settings in the `repo-memory` plugin hook.
+# `jq` parses tool payloads and writes hook output in the plugin hooks, edits
+# local settings in the `repo-memory` plugin hook, and assembles new files'
+# headers in the `header-metadata` plugin hook.
 #
 "aqua:jqlang/jq" = "1"
 

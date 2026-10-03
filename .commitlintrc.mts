@@ -21,6 +21,11 @@ export default defineConfig({
                 "Plugin: SessionStart hook to bun install in remote sessions",
         },
         {
+            name: "header-metadata",
+            fullName: "Header Metadata",
+            description: "Plugin: Hooks to write file headers",
+        },
+        {
             name: "plugin-lint",
             fullName: "Plugin Lint",
             description:

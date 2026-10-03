@@ -1,0 +1,33 @@
+{
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "sh",
+                        "args": [
+                            "${CLAUDE_PLUGIN_ROOT}/hooks/header-metadata.sh"
+                        ],
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "sh",
+                        "args": [
+                            "${CLAUDE_PLUGIN_ROOT}/hooks/header-metadata.sh"
+                        ],
+                        "timeout": 10
+                    }
+                ]
+            }
+        ]
+    }
+}

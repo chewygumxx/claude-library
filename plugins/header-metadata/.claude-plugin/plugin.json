@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    "name": "header-metadata",
+    "version": "0.0.1",
+    "displayName": "Header Metadata",
+    "description": "In any repository whose files already carry the house header, writes it into each new file Claude creates, copied from the nearest headed file, and says so at session start.",
+    "author": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/header-metadata",
+    "license": "GPL-3.0-only",
+    "keywords": ["hooks", "headers", "spdx"],
+    "defaultEnabled": true,
+    "hooks": "./hooks/hooks.json"
+}
