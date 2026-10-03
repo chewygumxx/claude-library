@@ -18,7 +18,7 @@ export default defineConfig({
             name: "claude",
             fullName: "Claude",
             description:
-                "Claude Code assets within /.claude/* (hooks, skills, agents, etc.)",
+                "Project Claude Code config within /.claude/* (settings, memory, etc.)",
         },
         {
             name: "bun-install",
@@ -40,8 +40,9 @@ export default defineConfig({
         },
         {
             name: "repo-metadata",
-            fullName: ".repo-metadata.jsonc",
-            description: "Plugin: Rule",
+            fullName: "Repo Metadata",
+            description:
+                "Plugin: Skill on editing GitHub settings via .repo-metadata.jsonc",
         },
     ],
 });

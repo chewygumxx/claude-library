@@ -20,6 +20,10 @@
         {
             "name": "repo-memory",
             "source": "./plugins/repo-memory"
+        },
+        {
+            "name": "repo-metadata",
+            "source": "./plugins/repo-metadata"
         }
     ]
 }

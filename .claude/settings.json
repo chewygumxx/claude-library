@@ -17,7 +17,8 @@
         "typescript-lsp@claude-plugins-official": true,
         "prohibit-em-dash@chewygumxx": true,
         "repo-memory@chewygumxx": true,
-        "bun-install@chewygumxx": true
+        "bun-install@chewygumxx": true,
+        "repo-metadata@chewygumxx": true
     },
     "extraKnownMarketplaces": {
         "chewygumxx": {
