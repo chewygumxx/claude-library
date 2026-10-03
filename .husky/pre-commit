@@ -27,10 +27,11 @@ git diff -z --cached --name-only --diff-filter=ACMR -- '*.toml' |
 git diff -z --cached --name-only --diff-filter=ACMR -- '*.toml' |
     xargs -0 -r tombi lint --error-on-warnings
 
-# U+2014 as UTF-8 bytes, so this file does not trip its own check. Colour and
-# external diff drivers are disabled: either would hide the leading "+".
+# U+2014 as UTF-8 bytes, so this file does not trip its own check. Colour,
+# external diff drivers and textconv filters are disabled: each can hide the
+# leading "+" or rewrite the em dash, such as a JSON textconv to "\u2014".
 emdash=$(printf '\342\200\224')
-if git diff --cached --no-color --no-ext-diff -U0 | grep '^+' | grep -q "$emdash"; then
+if git diff --cached --no-color --no-ext-diff --no-textconv -U0 | grep '^+' | grep -q "$emdash"; then
     echo "Em dash (U+2014) in staged changes; em dashes are prohibited." >&2
     exit 1
 fi
