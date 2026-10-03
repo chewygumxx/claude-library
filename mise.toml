@@ -64,13 +64,15 @@ bun = "1.4"
 # `claude plugin validate` checks each manifest along with the hooks, skills
 # and agents it ships. The CLI is a tool of this task alone rather than of
 # `[tools]`, so mise does not put it ahead of the contributor's own `claude`
-# on `PATH` in this directory.
+# on `PATH` in this directory. A report is printed only when it fails.
 #
 description = "Validate the marketplace and every plugin"
 tools       = { "aqua:anthropics/claude-code" = "2" }
 run         = """
-claude plugin validate --strict .
-for plugin in plugins/*/; do
-    claude plugin validate --strict "$plugin"
+for target in . plugins/*/; do
+    report=$(claude plugin validate --strict "$target") || {
+        printf '%s\n' "$report" >&2
+        exit 1
+    }
 done
 """
