@@ -15,7 +15,8 @@ title: "Repo Memory: README.md"
 description: >-
   Keeps auto memory inside the repository. At session start, points
   autoMemoryDirectory in the git ignored .claude/settings.local.json at the
-  project's .claude/memory, when that directory exists.
+  project's .claude/memory, creating it. Disabled by default; enable it per
+  project.
 tags:
   - llm
   - claude
@@ -30,14 +31,23 @@ tags:
 
 Keeps auto memory inside the repository. At session start, points
 `autoMemoryDirectory` in the git ignored `.claude/settings.local.json` at the
-project's `.claude/memory`, when that directory exists.
+project's `.claude/memory`, creating it.
 
 Auto memory then lives with the repository, git tracked, rather than under
 `~/.claude/projects/<project>/memory/`.
 
 ## Opting in
 
-Create `.claude/memory/` in the project. Projects without it are untouched.
+The plugin is disabled by default, since it creates `.claude/memory/` in every
+project where it runs. Enable it per project in `.claude/settings.json`:
+
+```json
+{
+    "enabledPlugins": {
+        "repo-memory@chewygumxx": true
+    }
+}
+```
 
 ## Why local settings
 

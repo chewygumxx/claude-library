@@ -1,9 +1,9 @@
 {
     "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
     "name": "repo-memory",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "displayName": "Repo Memory",
-    "description": "Keeps auto memory inside the repository. At session start, points autoMemoryDirectory in the git ignored .claude/settings.local.json at the project's .claude/memory, when that directory exists.",
+    "description": "Keeps auto memory inside the repository. At session start, points autoMemoryDirectory in the git ignored .claude/settings.local.json at the project's .claude/memory, creating it. Disabled by default; enable it per project.",
     "author": {
         "name": "chewygumxx",
         "email": "cgumxx@pm.me",
@@ -12,6 +12,6 @@
     "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/repo-memory",
     "license": "GPL-3.0-only",
     "keywords": ["hooks", "memory", "auto-memory"],
-    "defaultEnabled": true,
+    "defaultEnabled": false,
     "hooks": "./hooks/hooks.json"
 }
