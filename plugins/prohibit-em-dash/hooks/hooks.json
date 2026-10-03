@@ -8,7 +8,7 @@
                         "type": "command",
                         "command": "bash",
                         "args": [
-                            "${CLAUDE_PLUGIN_DIR}/hooks/prohibit-em-dash.sh"
+                            "${CLAUDE_PLUGIN_ROOT}/hooks/prohibit-em-dash.sh"
                         ],
                         "statusMessage": "Checking for em dashes",
                         "timeout": 10
