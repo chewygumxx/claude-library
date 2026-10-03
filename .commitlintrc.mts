@@ -27,6 +27,12 @@ export default defineConfig({
                 "Plugin: SessionStart hook to bun install in remote sessions",
         },
         {
+            name: "plugin-lint",
+            fullName: "Plugin Lint",
+            description:
+                "Plugin: PostToolUse hook to validate edited plugin files",
+        },
+        {
             name: "prohibit-em-dash",
             fullName: "Prohibit Em Dash",
             description:

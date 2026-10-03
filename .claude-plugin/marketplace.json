@@ -14,6 +14,10 @@
             "source": "./plugins/bun-install"
         },
         {
+            "name": "plugin-lint",
+            "source": "./plugins/plugin-lint"
+        },
+        {
             "name": "prohibit-em-dash",
             "source": "./plugins/prohibit-em-dash"
         },

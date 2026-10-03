@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    "name": "plugin-lint",
+    "version": "0.0.1",
+    "displayName": "Plugin Lint",
+    "description": "After Claude edits a plugin or marketplace manifest, a hooks file, a skill or an agent, runs claude plugin validate on it and reports any problem back to Claude.",
+    "author": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/plugin-lint",
+    "license": "GPL-3.0-only",
+    "keywords": ["hooks", "plugins", "validate", "lint"],
+    "defaultEnabled": true,
+    "hooks": "./hooks/hooks.json"
+}
