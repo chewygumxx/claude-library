@@ -58,3 +58,19 @@ bun = "1.4"
 #
 "aqua:astral-sh/uv" = "0.12.19"
 "pypi:yamllint"     = "1.38.0"
+
+[tasks."lint:plugins"]
+#
+# `claude plugin validate` checks each manifest along with the hooks, skills
+# and agents it ships. The CLI is a tool of this task alone rather than of
+# `[tools]`, so mise does not put it ahead of the contributor's own `claude`
+# on `PATH` in this directory.
+#
+description = "Validate the marketplace and every plugin"
+tools       = { "aqua:anthropics/claude-code" = "2" }
+run         = """
+claude plugin validate --strict .
+for plugin in plugins/*/; do
+    claude plugin validate --strict "$plugin"
+done
+"""
