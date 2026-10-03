@@ -1,5 +1,20 @@
 {
     "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "printf",
+                        "args": [
+                            "%s\\n",
+                            "Em dashes (U+2014) are prohibited in this project: a Write or Edit whose new text contains one is blocked and must be redone in full. Use a comma, colon, semicolon or parentheses instead."
+                        ],
+                        "timeout": 5
+                    }
+                ]
+            }
+        ],
         "PreToolUse": [
             {
                 "matcher": "Write|Edit",

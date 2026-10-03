@@ -15,7 +15,8 @@ title: "Prohibit Em Dash: README.md"
 description: >-
   Blocks any write or edit within the project directory whose proposed text
   contains an em dash, and tells the agent which lines to rewrite. Em dashes
-  already in a file do not block.
+  already in a file do not block, and a one-sentence reminder at session start
+  keeps most from being written at all.
 tags:
   - llm
   - claude
@@ -38,3 +39,7 @@ A `PreToolUse` hook on `Write|Edit` checks `tool_input.content` (Write) or
 blocks the call and returns the offending line numbers, counted within that
 proposed text, to the agent. Checking the proposed text rather than the whole
 file mirrors a pre-commit check of added lines only.
+
+A `SessionStart` hook, which also runs after compaction, puts one sentence
+saying so in Claude's context. It costs about 40 tokens a session, and saves
+regenerating a whole file when a `Write` is blocked.
