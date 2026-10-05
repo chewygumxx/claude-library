@@ -1,23 +1,24 @@
 ---
-__cgxx: |
-  # vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3:
-  # SPDX-License-Identifier: GPL-3.0-only
-
-  #
-  #
-  # ~chewygumxx/claude-library.git
-  # ::: :/.claude/rules/plugins.md
-  #
-  #
-
 ctime: 2026-10-04
+mtime: 2026-10-05
+spdx: GPL-3.0-only
 title: Writing plugins
+description: >-
+  How a plugin in this marketplace is written: its hooks, scripts, manifest and
+  README.
 tags:
   - llm
   - claude
 paths:
   - "plugins/**"
 ---
+
+<!--
+   -
+   - ~chewygumxx/claude-library.git
+   - ::: :/.claude/rules/plugins.md
+   -
+   -->
 
 # Writing plugins
 
@@ -56,3 +57,5 @@ containing what it guards. For a full pass, hand the plugin to the
 - A tool from `mise.toml` names, in its comment there, the plugins that need it
 - A new plugin starts from `/new-plugin`, which registers it everywhere it is
   listed
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->

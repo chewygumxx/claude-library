@@ -1,21 +1,24 @@
 ---
-__cgxx: |
-  # vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3:
-  # SPDX-License-Identifier: GPL-3.0-only
-
-  #
-  #
-  # ~chewygumxx/claude-library.git
-  # ::: :/.claude/skills/new-plugin/SKILL.md
-  #
-  #
-
+ctime: 2026-10-03
+mtime: 2026-10-05
+spdx: GPL-3.0-only
+title: New plugin
 name: new-plugin
 description: Scaffold a hook plugin in this marketplace and register it everywhere a plugin is listed.
+tags:
+  - llm
+  - claude
 argument-hint: <name> <what the plugin should do>
 disable-model-invocation: true
 allowed-tools: Bash(bun .claude/skills/new-plugin/scripts/new-plugin.mts *)
 ---
+
+<!--
+   -
+   - ~chewygumxx/claude-library.git
+   - ::: :/.claude/skills/new-plugin/SKILL.md
+   -
+   -->
 
 # New plugin
 
@@ -67,3 +70,5 @@ holding only its header and summary, and a README), adds the plugin to
 2. Hand the plugin to the `hook-verifier` agent
 3. Commit as `feat(<name>): Add <name> plugin`, then ask the user to run
    `/reload-plugins`
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->

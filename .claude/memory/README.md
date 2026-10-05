@@ -1,5 +1,16 @@
-<!-- vim:set expandtab shiftwidth=2 filetype=markdown: -->
-<!-- SPDX-License-Identifier: GPL-3.0-only -->
+---
+ctime: 2026-09-03
+mtime: 2026-10-05
+spdx: GPL-3.0-only
+title: ".claude/memory/"
+description: >-
+  What this directory holds: Claude Code's auto memory for the repository, an
+  index and one file per memory.
+tags:
+  - llm
+  - claude
+  - memory
+---
 
 <!--
    -
@@ -24,3 +35,5 @@ worktree without committing a machine-specific path.
 
 Files here are plain markdown, Claude reads and writes them during a
 session; review or edit them at any time via `/memory`.
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown: -->

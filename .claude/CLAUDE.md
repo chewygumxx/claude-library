@@ -1,22 +1,23 @@
 ---
-__cgxx: |
-  # vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3:
-  # SPDX-License-Identifier: GPL-3.0-only
-
-  #
-  #
-  # ~chewygumxx/claude-library.git
-  # ::: :/.claude/CLAUDE.md
-  #
-  #
-
 ctime: 2026-09-29
+mtime: 2026-10-05
+spdx: GPL-3.0-only
 title: CLAUDE.md
-description: "Repository instructions"
+description: >-
+  Claude Code's guide to this plugin marketplace: commit rules, the checks, the
+  house header and the prose style.
 tags:
-  - claude
   - llm
+  - claude
+  - claude-library
 ---
+
+<!--
+   -
+   - ~chewygumxx/claude-library.git
+   - ::: :/.claude/CLAUDE.md
+   -
+   -->
 
 # CLAUDE.md
 
@@ -52,3 +53,5 @@ newline-delimited items to your response:
 - JSON is indented with 4 spaces and formatted by Biome. A global git
   textconv shows JSON diffs sorted and re-indented; `git diff --no-textconv`
   shows the file as it is
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->
