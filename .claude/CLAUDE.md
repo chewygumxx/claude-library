@@ -46,9 +46,10 @@ newline-delimited items to your response:
   `package.json`, not whatever happens to be on `PATH`
 - Every file that can hold comments opens with the house header: vim
   modeline, SPDX licence, then `~chewygumxx/claude-library.git` and
-  `::: :/<path>` between empty comment lines, or under a `__cgxx` key in
-  Markdown front matter. Copy it from a sibling file; CI rewrites the path
-  after a move
+  `::: :/<path>` between empty comment lines. Markdown splits it: `spdx:` is
+  a front matter key, the box an HTML comment beneath the front matter and
+  the modeline an HTML comment on the last line. Copy it from a sibling
+  file; CI rewrites the path after a move
 - Prose is in British English, and em dashes are prohibited
 - JSON is indented with 4 spaces and formatted by Biome. A global git
   textconv shows JSON diffs sorted and re-indented; `git diff --no-textconv`
