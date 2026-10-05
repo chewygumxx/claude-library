@@ -1,16 +1,7 @@
 ---
-__cgxx: |
-  # vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3:
-  # SPDX-License-Identifier: GPL-3.0-only
-
-  #
-  #
-  # ~chewygumxx/claude-library.git
-  # ::: :/plugins/repo-memory/README.md
-  #
-  #
-
 ctime: 2026-10-03
+mtime: 2026-10-05
+spdx: GPL-3.0-only
 title: "Repo Memory: README.md"
 description: >-
   Keeps auto memory inside the repository. At session start, points
@@ -26,6 +17,13 @@ tags:
   - hooks
   - memory
 ---
+
+<!--
+   -
+   - ~chewygumxx/claude-library.git
+   - ::: :/plugins/repo-memory/README.md
+   -
+   -->
 
 # Repo Memory
 
@@ -57,3 +55,5 @@ directory path and be rewritten by every other clone or worktree. The hook
 therefore refuses to write `.claude/settings.local.json` unless git ignores it.
 
 Requires `jq`.
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->

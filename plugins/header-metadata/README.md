@@ -1,16 +1,7 @@
 ---
-__cgxx: |
-  # vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3:
-  # SPDX-License-Identifier: GPL-3.0-only
-
-  #
-  #
-  # ~chewygumxx/claude-library.git
-  # ::: :/plugins/header-metadata/README.md
-  #
-  #
-
 ctime: 2026-10-04
+mtime: 2026-10-05
+spdx: GPL-3.0-only
 title: "Header Metadata: README.md"
 description: >-
   In any repository whose files already carry the house header, writes it
@@ -26,6 +17,13 @@ tags:
   - headers
   - spdx
 ---
+
+<!--
+   -
+   - ~chewygumxx/claude-library.git
+   - ::: :/plugins/header-metadata/README.md
+   -
+   -->
 
 # Header Metadata
 
@@ -91,3 +89,5 @@ for the same instruction in a repository's CLAUDE.md.
 Requires `jq` and `git`.
 
 [sync-header-metadata]: https://github.com/chewygumxx/sync-header-metadata
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->

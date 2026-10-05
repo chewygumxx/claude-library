@@ -1,16 +1,7 @@
 ---
-__cgxx: |
-  # vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3:
-  # SPDX-License-Identifier: GPL-3.0-only
-
-  #
-  #
-  # ~chewygumxx/claude-library.git
-  # ::: :/plugins/prohibit-em-dash/README.md
-  #
-  #
-
 ctime: 2026-10-03
+mtime: 2026-10-05
+spdx: GPL-3.0-only
 title: "Prohibit Em Dash: README.md"
 description: >-
   Blocks any write or edit within the project directory whose proposed text
@@ -28,6 +19,13 @@ tags:
   - em-dash
 ---
 
+<!--
+   -
+   - ~chewygumxx/claude-library.git
+   - ::: :/plugins/prohibit-em-dash/README.md
+   -
+   -->
+
 # Prohibit Em Dash
 
 Blocks any write or edit within the project directory whose proposed text
@@ -43,3 +41,5 @@ file mirrors a pre-commit check of added lines only.
 A `SessionStart` hook, which also runs after compaction, puts one sentence
 saying so in Claude's context. It costs about 40 tokens a session, and saves
 regenerating a whole file when a `Write` is blocked.
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->

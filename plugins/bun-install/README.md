@@ -1,16 +1,7 @@
 ---
-__cgxx: |
-  # vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3:
-  # SPDX-License-Identifier: GPL-3.0-only
-
-  #
-  #
-  # ~chewygumxx/claude-library.git
-  # ::: :/plugins/bun-install/README.md
-  #
-  #
-
 ctime: 2026-10-03
+mtime: 2026-10-05
+spdx: GPL-3.0-only
 title: "Bun Install: README.md"
 description: >-
   At the start of a remote (cloud) session, installs the project's dependencies
@@ -24,6 +15,13 @@ tags:
   - hooks
   - bun
 ---
+
+<!--
+   -
+   - ~chewygumxx/claude-library.git
+   - ::: :/plugins/bun-install/README.md
+   -
+   -->
 
 # Bun Install
 
@@ -39,3 +37,5 @@ The hook does nothing when any of these hold:
 - `CLAUDE_CODE_REMOTE` is not `true`, as in a local session
 - The project has no `package.json`, or no `bun.lock` or `bun.lockb`
 - `bun` is not on `PATH`
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->

@@ -1,21 +1,22 @@
 ---
-__cgxx: |
-  # vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3:
-  # SPDX-License-Identifier: GPL-3.0-only
-
-  #
-  #
-  # ~chewygumxx/claude-library.git
-  # ::: :/plugins/repo-metadata/hooks/repo-metadata.md
-  #
-  #
-
 ctime: 2026-09-27
+mtime: 2026-10-05
+spdx: GPL-3.0-only
 title: Repository metadata
+description: >-
+  The reminder shown after .repo-metadata.jsonc is read: which GitHub settings
+  CI applies from it, and why they are edited there.
 tags:
   - llm
   - claude
 ---
+
+<!--
+   -
+   - ~chewygumxx/claude-library.git
+   - ::: :/plugins/repo-metadata/hooks/repo-metadata.md
+   -
+   -->
 
 # `.repo-metadata.jsonc` is the GitHub settings page
 
@@ -31,3 +32,5 @@ A key the file leaves out is left alone on GitHub. A key it sets is the setting:
 changing it in the web interface, with `gh repo edit` or with `gh api`, is the
 failure worth naming, since nothing rejects it and the next push silently
 reverts it.
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->

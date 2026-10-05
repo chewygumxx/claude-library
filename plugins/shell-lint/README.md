@@ -1,16 +1,7 @@
 ---
-__cgxx: |
-  # vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3:
-  # SPDX-License-Identifier: GPL-3.0-only
-
-  #
-  #
-  # ~chewygumxx/claude-library.git
-  # ::: :/plugins/shell-lint/README.md
-  #
-  #
-
 ctime: 2026-10-03
+mtime: 2026-10-05
+spdx: GPL-3.0-only
 title: "Shell Lint: README.md"
 description: >-
   After Claude writes or edits a shell script, found by shebang as well as
@@ -27,6 +18,13 @@ tags:
   - shellcheck
   - shfmt
 ---
+
+<!--
+   -
+   - ~chewygumxx/claude-library.git
+   - ::: :/plugins/shell-lint/README.md
+   -
+   -->
 
 # Shell Lint
 
@@ -51,3 +49,5 @@ The hook does nothing when any of these hold:
   version set for the project; without `shellcheck`, it only formats
 
 Requires `jq`.
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->

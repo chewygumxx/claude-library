@@ -1,16 +1,7 @@
 ---
-__cgxx: |
-  # vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3:
-  # SPDX-License-Identifier: GPL-3.0-only
-
-  #
-  #
-  # ~chewygumxx/claude-library.git
-  # ::: :/plugins/plugin-lint/README.md
-  #
-  #
-
 ctime: 2026-10-03
+mtime: 2026-10-05
+spdx: GPL-3.0-only
 title: "Plugin Lint: README.md"
 description: >-
   After Claude edits a plugin or marketplace manifest, a hooks file, a skill or
@@ -27,6 +18,13 @@ tags:
   - validate
   - lint
 ---
+
+<!--
+   -
+   - ~chewygumxx/claude-library.git
+   - ::: :/plugins/plugin-lint/README.md
+   -
+   -->
 
 # Plugin Lint
 
@@ -53,3 +51,5 @@ The hook does nothing when any of these hold:
 - `claude` is not on `PATH`
 
 Requires `jq`.
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->

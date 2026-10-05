@@ -1,16 +1,7 @@
 ---
-__cgxx: |
-  # vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3:
-  # SPDX-License-Identifier: GPL-3.0-only
-
-  #
-  #
-  # ~chewygumxx/claude-library.git
-  # ::: :/plugins/repo-metadata/README.md
-  #
-  #
-
 ctime: 2026-10-03
+mtime: 2026-10-05
+spdx: GPL-3.0-only
 title: "Repo Metadata: README.md"
 description: >-
   Tells the agent that .repo-metadata.jsonc, applied by CI on every push to
@@ -26,6 +17,13 @@ tags:
   - hooks
   - github
 ---
+
+<!--
+   -
+   - ~chewygumxx/claude-library.git
+   - ::: :/plugins/repo-metadata/README.md
+   -
+   -->
 
 # Repo Metadata
 
@@ -53,3 +51,5 @@ Requires `jq`.
 `gh api` and the web interface are not caught; the next push reverts them.
 
 [sync-repo-metadata]: https://github.com/chewygumxx/sync-repo-metadata
+
+<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->
