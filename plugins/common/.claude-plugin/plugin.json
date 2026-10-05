@@ -1,0 +1,25 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    "name": "common",
+    "version": "0.0.1",
+    "displayName": "Common",
+    "description": "Ubiquitious baseline plugins of minimal token demand",
+    "author": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/github-mcp",
+    "license": "GPL-3.0-only",
+    "keywords": ["github", "mcp", "config"],
+    "defaultEnabled": true,
+    "dependencies": [
+        "prohibit-em-dash",
+        "github-mcp",
+        "header-metadata",
+        "repo-metadata",
+        "repo-memory",
+        "shell-lint",
+        "bun-install"
+    ]
+}

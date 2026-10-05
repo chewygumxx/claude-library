@@ -13,12 +13,7 @@
         "superpowers@claude-plugins-official": true,
         "plugin-dev@claude-plugins-official": true,
 
-        "prohibit-em-dash@chewygumxx": true,
-        "repo-memory@chewygumxx": true,
-        "bun-install@chewygumxx": true,
-        "repo-metadata@chewygumxx": true,
-        "header-metadata@chewygumxx": true,
-        "shell-lint@chewygumxx": true,
+        "common@chewygumxx": true,
         "plugin-lint@chewygumxx": true
     },
     "extraKnownMarketplaces": {

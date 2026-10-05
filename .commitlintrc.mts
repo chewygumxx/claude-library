@@ -15,6 +15,11 @@ import { defineConfig } from "@chewygumxx/commitlint-config";
 export default defineConfig({
     scopes: [
         {
+            name: "common",
+            fullName: "Common",
+            description: "Ubiquitious baseline plugins of minimal token demand",
+        },
+        {
             name: "bun-install",
             fullName: "Bun Install",
             description:

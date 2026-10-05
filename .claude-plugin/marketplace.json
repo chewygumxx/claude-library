@@ -1,7 +1,7 @@
 {
     "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
     "name": "chewygumxx",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "My personal Claude Code plugins",
     "owner": {
         "name": "chewygumxx",
@@ -9,6 +9,10 @@
         "url": "https://github.com/chewygumxx"
     },
     "plugins": [
+        {
+            "name": "common",
+            "source": "./plugins/common"
+        },
         {
             "name": "bun-install",
             "source": "./plugins/bun-install"
