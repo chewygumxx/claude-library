@@ -43,7 +43,12 @@ event=$(printf '%s' "${input}" | jq -r '.hook_event_name // empty')
 
 if [ "${event}" = SessionStart ]; then
     git -C "${project}" grep -q -I -E "${MARKER}" 2>/dev/null || exit 0
-    printf '%s\n' "This repository's files open with a house header, which the header-metadata hook writes into each file created with Write, copied from the nearest headed file: leave it out of new files and keep it intact in existing ones. After moving or renaming files, \`bunx sync-header-metadata --update\` corrects their headers' paths."
+    printf '%s' "This repository's files open with a house header, which the header-metadata hook writes into each file created with Write, copied from the nearest headed file: leave it out of new files and keep it intact in existing ones."
+    # Only where Markdown is headed, so the sentence costs nothing elsewhere.
+    if git -C "${project}" grep -q -I -E "${MARKER}" -- '*.md' 2>/dev/null; then
+        printf ' %s' "In Markdown it adds the ctime, mtime and spdx front matter keys, the box beneath and the closing modeline; write the other keys, such as title, description and tags, yourself."
+    fi
+    printf ' %s\n' "After moving or renaming files, \`bunx sync-header-metadata --update\` corrects their headers' paths."
     exit 0
 fi
 
@@ -237,17 +242,20 @@ else
     mv "${tmp}/candidates" "${tmp}/ordered"
 fi
 
-# Prints a file's header: from its first line, or in Markdown front matter
-# from its __cgxx key, to the two comment-only lines closing the banner after
-# the path marker. Fails when the marker is not within the first 40 lines.
+# Prints a file's header: from its first line, or past Markdown front matter,
+# or in it from a __cgxx key, to the two comment-only lines closing the banner
+# after the path marker. Fails when the marker is not within the first 40
+# lines.
 extract() {
     awk -v re="${MARKER}" '
         NR > 40 && !marked { exit }
         NR == 1 && $0 == "---" { fm = 1; next }
         fm && !started {
             if ($0 ~ /^__cgxx:/) started = 1
-            else if ($0 == "---") exit
-            else next
+            else {
+                if ($0 == "---") fm = 0
+                next
+            }
         }
         marked && ($0 !~ /^[[:space:]]*[-#\/;*!<>%"]+[[:space:]]*$/ || closing++ == 2) {
             exit
@@ -273,14 +281,74 @@ while IFS="$(printf '\t')" read -r kind candidate; do
     fi
 done <"${tmp}/ordered"
 [ -n "${source}" ] || exit 0
+markdown=false
+case ${key} in
+markdown | md) markdown=true ;;
+*) ;;
+esac
 # A header in front matter suits only Markdown.
-[ "${style}" = plain ] || [ "${kind}" = type ] || exit 0
+[ "${style}" = plain ] || [ "${markdown}" = true ] || exit 0
+today=$(date +%Y-%m-%d)
 
-jq --rawfile header "${tmp}/header" --arg slug "${slug}" --arg path "${path}" \
+jq --rawfile header "${tmp}/header" --rawfile src "${root}/${source}" \
+    --arg slug "${slug}" --arg path "${path}" --arg today "${today}" \
     --arg rel "${rel}" --arg source "${source}" --arg kind "${kind}" \
-    --arg style "${style}" --arg filetype "${filetype}" "${JQ_DEFS}"'
+    --argjson markdown "${markdown}" --arg filetype "${filetype}" "${JQ_DEFS}"'
     def bang: (.[0] // "") | startswith("#!");
     def leading_blanks: ((map(. != "") | index(true)) // length) as $i | .[$i:];
+    def trim_blanks: leading_blanks | reverse | leading_blanks | reverse;
+
+    # Markdown splits the header in three: ctime, mtime and spdx keys in the
+    # front matter, the banner as an HTML comment box beneath it, and the
+    # modeline on the last line. Each is read from the source in whichever
+    # shape it has, so a __cgxx header or a file of another type serves too.
+    def markdown_header:
+        ($src | split("\n")) as $s
+        | $s[:40] as $top
+        | ([($top + $s[-5:])[]
+            | capture("(?<m>vim:set [^>]*?:)(?:\\s*-->)?\\s*$") | .m]
+           | first
+           | if . != null and $kind != "type"
+             then sub("filetype=[^ :]+"; "filetype=markdown") else . end)
+          as $modeline
+        | ([$top[] | (capture("^spdx:\\s*(?<v>\\S+)\\s*$"),
+                      capture("SPDX-License-Identifier:\\s*(?<v>[^\\s>]+)"))
+            | .v] | first) as $spdx
+        | ([$top[] | capture("^ctime:\\s*(?<v>\\S+)\\s*$") | .v] | first)
+          as $ctime
+        | ($top | map(test(" ::: :/")) | index(true)) as $p
+        | ([range(0; $p + 1) | select($top[.] | startswith("<!--"))] | last)
+          as $a
+        | ([range($p; $top | length) | select($top[.] | test("-->"))] | first)
+          as $z
+        | (if $a != null and $z != null then $top[$a:$z + 1]
+           else ["<!--", "   -"]
+             + ([$top[] | capture("(?<r>~\\S+/\\S+?\\.git)\\s*$")
+                 | "   - \(.r)"] | .[:1])
+             + ["   - ::: :/", "   -", "   -->"]
+           end | markers($slug; $path)) as $box
+        | (.tool_input.content // "" | split("\n")) as $lines
+        | (if $lines[0] == "---" then $lines[1:] | index(["---"]) else null end)
+          as $c
+        | (if $c != null then $lines[1:$c + 1] else [] end) as $fm
+        | (if $c != null then $lines[$c + 2:] else $lines end | trim_blanks)
+          as $body
+        | ($fm | map(select(test("^(ctime|mtime|spdx):")))) as $own
+        | def own($k): [$own[] | select(startswith("\($k):"))] | first;
+        # A file being overwritten keeps its own ctime.
+          ["---",
+           own("ctime") // "ctime: \(if $source == $rel and $ctime != null
+                                   then $ctime else $today end)",
+           own("mtime") // "mtime: \($today)"]
+          + ([own("spdx") // (if $spdx != null then "spdx: \($spdx)"
+                              else empty end)])
+          + ($fm | map(select(test("^(ctime|mtime|spdx):") | not)))
+          + ["---", ""] + $box + [""] + $body
+          + (if $modeline == null
+                or ($body | last // "" | test("^<!--.*vim:set .*-->$"))
+             then []
+             else [""] + ["<!-- \($modeline) -->"] end)
+          | trim_blanks + [""];
 
     . as $in
     | ($header | rtrimstr("\n") | split("\n") | markers($slug; $path)) as $h
@@ -295,9 +363,7 @@ jq --rawfile header "${tmp}/header" --arg slug "${slug}" --arg path "${path}" \
           + [""] + $h[$b + 1:]
       end) as $h
     | (.tool_input.content // "" | split("\n")) as $lines
-    | if $style == "frontmatter" then
-        if $lines[0] == "---" then ["---"] + $h + [""] + $lines[1:]
-        else ["---"] + $h + ["---", ""] + $lines end
+    | if $markdown then markdown_header
       else
         # The content keeps its shebang; otherwise it takes the source s.
         (if ($lines | bang) then $lines[:1]
@@ -315,5 +381,9 @@ jq --rawfile header "${tmp}/header" --arg slug "${slug}" --arg path "${path}" \
       end
     | join("\n") as $content
     | $in | respond($content;
-        "header-metadata added the file header to \($rel), copied from \($source); read the file before editing its first lines.")
+        if $markdown then
+            "header-metadata added the file header to \($rel), copied from \($source): ctime, mtime and spdx in its front matter, the box beneath it and the modeline on its last line; read the file before editing its first or last lines."
+        else
+            "header-metadata added the file header to \($rel), copied from \($source); read the file before editing its first lines."
+        end)
 ' "${tmp}/input"

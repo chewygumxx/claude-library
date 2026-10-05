@@ -60,19 +60,25 @@ source is, in order:
 
 Nearest means the most shared directories, then the shallowest. In every case
 only the `~owner/repo.git` line, taken from the `origin` remote, and the
-`::: :/<path>` line change. A shebang in Claude's content comes first; in
-Markdown, so does front matter, unless the header lives in it under a
-`__cgxx` key.
+`::: :/<path>` line change. A shebang in Claude's content comes first.
+
+Markdown takes the header in three parts, read from the source in whatever
+shape it has: `ctime`, `mtime` and `spdx` keys at the top of the front
+matter, ahead of any keys Claude wrote, the banner as an HTML comment box
+beneath it, and the modeline on the last line. Both dates are today's, but
+a file being overwritten keeps its own `ctime`.
 
 Content that already holds a header only has those two lines corrected.
 
 ## At session start
 
-In a headed repository, a `SessionStart` hook adds one sentence, about 70
-tokens, telling Claude to leave the header out of new files and to keep it
-intact in existing ones, and that after moving or renaming files
-`bunx sync-header-metadata --update` corrects their paths. It can stand in
-for the same instruction in a repository's CLAUDE.md.
+In a headed repository, a `SessionStart` hook adds about 70 tokens, telling
+Claude to leave the header out of new files and to keep it intact in existing
+ones, and that after moving or renaming files
+`bunx sync-header-metadata --update` corrects their paths. Where Markdown is
+headed, about 40 more say which front matter keys the hook writes and which
+are Claude's. It can stand in for the same instruction in a repository's
+CLAUDE.md.
 
 ## When it does nothing
 
