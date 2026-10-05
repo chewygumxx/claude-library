@@ -38,8 +38,9 @@ process runs until a matching tool call, replace the rule at no standing token
 cost:
 
 - `PostToolUse` on `Read(.repo-metadata.jsonc)` adds
-  [`hooks/repo-metadata.md`](hooks/repo-metadata.md) to Claude's context, as a
-  path-scoped rule would when the file is read
+  [`hooks/repo-metadata.md`](hooks/repo-metadata.md), less its front matter
+  and file header, to Claude's context, as a path-scoped rule would when the
+  file is read
 - `PreToolUse` on `Bash(gh repo edit *)` denies a flag whose setting the
   project's `.repo-metadata.jsonc` sets, and points Claude at the file instead.
   sync-repo-metadata leaves a key the file omits alone on GitHub, so a flag

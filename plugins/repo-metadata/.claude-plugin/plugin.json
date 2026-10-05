@@ -1,7 +1,7 @@
 {
     "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
     "name": "repo-metadata",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "displayName": "Repo Metadata",
     "description": "Tells the agent that .repo-metadata.jsonc, applied by CI on every push to main through sync-repo-metadata, is where the GitHub settings it sets are edited, and denies gh repo edit changing them, since changes made on GitHub are silently reverted.",
     "author": {
