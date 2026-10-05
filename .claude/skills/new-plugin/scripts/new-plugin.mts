@@ -155,6 +155,20 @@ function banner(path: string, prefix: string, modeline: string) {
         .join("\n");
 }
 
+// Markdown's form of the banner: an HTML comment beneath the front matter,
+// whose dashes align under the "!" of "<!--". The modeline and licence move
+// to the last line and the front matter.
+function box(path: string) {
+    return [
+        "<!--",
+        "   -",
+        `   - ~${slug}.git`,
+        `   - ::: :/${path}`,
+        "   -",
+        "   -->",
+    ].join("\n");
+}
+
 // Reads a template, drops its own leading comment block, and fills it.
 async function render(template: string, fields: Record<string, string>) {
     const path = join(import.meta.dir, "..", "templates", template);
@@ -251,11 +265,10 @@ const readmePath = join(pluginDirectory, "README.md");
 await write(
     readmePath,
     await render("README.md.tmpl", {
-        banner: banner(
-            readmePath,
-            "  #",
-            "expandtab shiftwidth=2 filetype=markdown foldlevel=3",
-        ),
+        box: box(readmePath),
+        modeline:
+            "<!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->",
+        spdx: packageJson.license,
         date: TODAY,
         displayName,
         descriptionFolded: wrap(description, "  "),

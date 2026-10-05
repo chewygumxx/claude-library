@@ -12,10 +12,9 @@
 # fills each {{placeholder}}.
 
 ---
-__cgxx: |
-{{banner}}
-
 ctime: {{date}}
+mtime: {{date}}
+spdx: {{spdx}}
 title: "{{displayName}}: README.md"
 description: >-
 {{descriptionFolded}}
@@ -28,6 +27,10 @@ tags:
 {{tags}}
 ---
 
+{{box}}
+
 # {{displayName}}
 
 {{descriptionWrapped}}
+
+{{modeline}}
