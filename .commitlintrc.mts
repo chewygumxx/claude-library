@@ -55,5 +55,10 @@ export default defineConfig({
             description:
                 "Plugin: PostToolUse hook to shfmt and shellcheck scripts",
         },
+        {
+            name: "github-mcp",
+            fullName: "GitHub MCP",
+            description: "GitHub MCP Server Integration via `gh auth token`",
+        },
     ],
 });

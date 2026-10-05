@@ -36,6 +36,10 @@
         {
             "name": "shell-lint",
             "source": "./plugins/shell-lint"
+        },
+        {
+            "name": "github-mcp",
+            "source": "./plugins/github-mcp"
         }
     ]
 }

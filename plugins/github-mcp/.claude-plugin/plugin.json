@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    "name": "github-mcp",
+    "version": "1.0.0",
+    "displayName": "GitHub MCP",
+    "description": "GitHub MCP Server Integration via `gh auth token`",
+    "author": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/github-mcp",
+    "license": "GPL-3.0-only",
+    "keywords": ["github", "mcp", "config"],
+    "defaultEnabled": true,
+    "mcpServers": {
+        "github": {
+            "type": "http",
+            "url": "https://api.githubcopilot.com/mcp",
+            "headersHelper": "token=\"$(gh auth token)\" && printf '{\"Authorization\":\"Bearer %s\"}' \"$token\""
+        }
+    }
+}
