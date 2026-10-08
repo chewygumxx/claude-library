@@ -1,0 +1,16 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    "name": "compact",
+    "version": "0.0.1",
+    "displayName": "Compact Summary",
+    "description": "Generate a compaction invocation",
+    "author": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/compact",
+    "license": "GPL-3.0-only",
+    "keywords": ["compact", "summary", "tokens", "context"],
+    "defaultEnabled": true
+}

@@ -65,5 +65,10 @@ export default defineConfig({
             fullName: "GitHub MCP",
             description: "GitHub MCP Server Integration via `gh auth token`",
         },
+        {
+            name: "compact",
+            fullName: "Compact",
+            description: "Plugin: Skill to generate a compaction invocation",
+        },
     ],
 });
