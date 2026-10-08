@@ -17,7 +17,7 @@ export default defineConfig({
         {
             name: "common",
             fullName: "Common",
-            description: "Ubiquitious baseline plugins of minimal token demand",
+            description: "Ubiquitous baseline plugins of minimal token demand",
         },
         {
             name: "bun-install",

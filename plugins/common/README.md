@@ -1,10 +1,10 @@
 ---
 ctime: 2026-10-05
-mtime: 2026-10-05
+mtime: 2026-10-09
 spdx: GPL-3.0-only
 title: Common
 description: >-
-  Ubiquitious baseline plugins of minimal token demand
+  Ubiquitous baseline plugins of minimal token demand
 tags:
   - claude
   - claude-code
@@ -20,7 +20,7 @@ tags:
 
 # Common
 
-Ubiquitious baseline plugins of minimal token demand.
+Ubiquitous baseline plugins of minimal token demand.
 
 <!-- TODO(@chewygumxx): Low
    -
