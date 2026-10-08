@@ -24,8 +24,17 @@ tags:
 
 Generate a compaction invocation.
 
-Run `/compact:compact` and Claude rates the case for compacting now, then
-writes a `/compact <summary>` to run.
+Run `/compact:compact` and Claude writes a `/compact <instructions>` to run,
+then justifies and rates it in four fixed lines, for a person or a driver to
+parse:
+
+- Appraisal, 1-100: the share of the context the foreseeable work no longer
+  needs, the benefit of compacting
+- Risk, 1-100: how likely the instructions are to let compaction lose what
+  that work needs, weighted by the severity of the loss, the cost
+
+A driver measures how full the context is itself and compacts when it is
+full enough, Appraisal is high enough and Risk is low enough.
 
 The skill is user invoked only. As a standing instruction in `CLAUDE.md`, the
 same request cost tokens in every session, prompted superfluous summaries
