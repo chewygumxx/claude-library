@@ -34,7 +34,9 @@ parse:
   that work needs, weighted by the severity of the loss, the cost
 
 A driver measures how full the context is itself and compacts when it is
-full enough, Appraisal is high enough and Risk is low enough.
+full enough, Appraisal is high enough and Risk is low enough. A driver that
+knows the next task passes it as `/compact:compact <foreseeable work>`, and
+both ratings judge against it rather than Claude's own expectation.
 
 The skill is user invoked only. As a standing instruction in `CLAUDE.md`, the
 same request cost tokens in every session, prompted superfluous summaries

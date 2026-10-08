@@ -9,6 +9,7 @@ description: >-
 tags:
   - llm
   - claude
+argument-hint: "[foreseeable work]"
 disable-model-invocation: true
 ---
 
@@ -20,7 +21,12 @@ disable-model-invocation: true
    -->
 
 Assess compacting the conversation now, for the work you foresee being asked
-to do next. Print exactly these four lines, in this order, and nothing else:
+to do next. Work stated on the next line overrides your own expectation;
+when it is blank, rely on yours.
+
+Foreseeable work: $ARGUMENTS
+
+Print exactly these four lines, in this order, and nothing else:
 
 ```text
 /compact <instructions>
