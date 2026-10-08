@@ -63,6 +63,8 @@ holding only its header and summary, and a README), adds the plugin to
 - The README beyond its first paragraph: why the hook exists, when it does
   nothing, and what it requires
 - The summary comment in the hook script, if the generated one reads badly
+- `test/<name>.test.mts`: a case for each branch that acts and each early
+  exit, with `runHook` from `test/hook.mts`
 
 ## 4. Verify and commit
 

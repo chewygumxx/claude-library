@@ -48,7 +48,12 @@ paths:
 
 ## Testing
 
-Put test payloads in a script file rather than a Bash command: this
+Each hook script has its cases in `test/<plugin>.test.mts`, run by
+`bun run test` through the helpers in `test/hook.mts`; a change in
+behaviour adds a case. Build a header's path marker from `MARKER` rather
+than writing it out, or header-metadata takes it for the test file's own.
+
+Put any other test payloads in a script file rather than a Bash command: this
 session's own hooks see the command, and one may deny it for merely
 containing what it guards. For a full pass, hand the plugin to the
 `hook-verifier` agent.
