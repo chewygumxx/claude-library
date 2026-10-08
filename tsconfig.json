@@ -6,6 +6,7 @@
         "moduleResolution": "nodenext",
         "strict": true,
         "noEmit": true,
+        "allowImportingTsExtensions": true,
         "allowJs": true,
         "checkJs": true,
         "types": ["bun"],
@@ -14,6 +15,7 @@
     "include": [
         ".commitlintrc.mts",
         ".claude/skills/*/scripts/*.mts",
-        "scripts/*.mts"
+        "scripts/*.mts",
+        "test/*.mts"
     ]
 }

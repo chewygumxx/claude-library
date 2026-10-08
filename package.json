@@ -37,7 +37,7 @@
     },
     "scripts": {
         "bump": "bun scripts/bump-plugin.mts",
-        "check": "bun run typecheck && bun run lint:biome && bun run lint:md && bun run lint:yaml && bun run lint:toml && bun run lint:sh && bun run lint:plugins && bun run lint:emdash",
+        "check": "bun run typecheck && bun run test && bun run lint:biome && bun run lint:md && bun run lint:yaml && bun run lint:toml && bun run lint:sh && bun run lint:plugins && bun run lint:emdash",
         "commit": "cz",
         "format": "biome format --write . && bun run format:yaml && bun run format:toml && bun run format:sh",
         "format:check": "biome format .",
@@ -53,6 +53,7 @@
         "lint:toml": "git ls-files -z '*.toml' | xargs -0 -r tombi format --check && git ls-files -z '*.toml' | xargs -0 -r tombi lint --error-on-warnings",
         "lint:yaml": "git ls-files -z '*.yaml' '*.yml' | xargs -0 -r prettier --check && git ls-files -z '*.yaml' '*.yml' | xargs -0 -r yamllint --strict",
         "prepare": "test -d node_modules/husky && husky || true",
+        "test": "mise run --quiet test",
         "typecheck": "tsc"
     },
     "config": {

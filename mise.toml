@@ -87,6 +87,17 @@ for target in . .claude plugins/*/; do
 done
 """
 
+[tasks.test]
+#
+# Runs each plugin hook script against crafted payloads in temporary
+# projects. The plugin-lint cases call `claude plugin validate`, so the CLI
+# is a tool of this task too, as for `lint:plugins`; a case whose tool does
+# not run is skipped.
+#
+description = "Test the plugin hook scripts"
+tools       = { "aqua:anthropics/claude-code" = "2" }
+run         = "bun test ./test/"
+
 [tasks.act]
 #
 # Runs CI locally in Docker; see the `chewygumxx/.github` README.

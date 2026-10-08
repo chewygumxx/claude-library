@@ -38,6 +38,10 @@ if ! git diff --cached --quiet -- .claude-plugin .claude/agents .claude/skills p
     mise run --quiet lint:plugins
 fi
 
+if ! git diff --cached --quiet -- plugins test; then
+    mise run --quiet test
+fi
+
 # U+2014 as UTF-8 bytes, so this file does not trip its own check. Colour,
 # external diff drivers and textconv filters are disabled: each can hide the
 # leading "+" or rewrite the em dash, such as a JSON textconv to "\u2014".
