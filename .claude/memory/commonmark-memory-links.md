@@ -1,6 +1,6 @@
 ---
 name: commonmark-memory-links
-description: "Link between memories with CommonMark links, never [[wikilinks]]"
+description: "Link between memories with CommonMark links, never wikilinks"
 metadata:
   node_type: memory
   spdx: GPL-3.0-only
