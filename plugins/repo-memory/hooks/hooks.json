@@ -17,7 +17,22 @@
         ],
         "PreToolUse": [
             {
-                "matcher": "Write|Edit",
+                "matcher": "Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "if": "Write(**/.claude/memory/**)",
+                        "command": "sh",
+                        "args": [
+                            "${CLAUDE_PLUGIN_ROOT}/hooks/prohibit-wikilinks.sh"
+                        ],
+                        "timeout": 10,
+                        "statusMessage": "Checking memory for wikilinks"
+                    }
+                ]
+            },
+            {
+                "matcher": "Edit",
                 "hooks": [
                     {
                         "type": "command",

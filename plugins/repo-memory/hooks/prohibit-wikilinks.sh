@@ -10,8 +10,8 @@
 #
 
 #
-# PreToolUse hook on Write|Edit, narrowed by its `if` filter to the
-# project's .claude/memory. Blocks a write or edit whose proposed text
+# PreToolUse hook on Write and on Edit, each narrowed by its own `if` filter
+# to the project's .claude/memory. Blocks a write or edit whose proposed text
 # (Write's content, Edit's new_string) holds a wikilink, and tells Claude
 # which lines to relink in CommonMark. Only the text being introduced is
 # checked, so wikilinks already in a file do not block.
