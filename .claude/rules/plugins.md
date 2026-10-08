@@ -29,7 +29,9 @@ paths:
   executable bit. Use `bash` only when the script needs it
 - On a tool event, prefer an `if` permission rule, such as `Edit(*.sh)`, so no
   process runs until a matching call. Check again in the script: Claude Code
-  runs the hook regardless when it cannot parse a Bash command
+  runs the hook regardless when it cannot parse a Bash command. Leave it out
+  when no glob names the files, as for shell-lint, which finds scripts by
+  shebang
 - An `if` rule names one tool: `Edit(...)` does not match a Write call, though
   a permission rule would. To cover both, give each tool its own matcher
   entry, with `Write(...)` and `Edit(...)` rules
