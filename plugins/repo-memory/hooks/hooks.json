@@ -14,6 +14,23 @@
                     }
                 ]
             }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "Write|Edit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "if": "Edit(**/.claude/memory/**)",
+                        "command": "sh",
+                        "args": [
+                            "${CLAUDE_PLUGIN_ROOT}/hooks/prohibit-wikilinks.sh"
+                        ],
+                        "timeout": 10,
+                        "statusMessage": "Checking memory for wikilinks"
+                    }
+                ]
+            }
         ]
     }
 }

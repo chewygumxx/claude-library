@@ -46,7 +46,7 @@ export default defineConfig({
             name: "repo-memory",
             fullName: "Repo Memory",
             description:
-                "Plugin: SessionStart hook to pin autoMemoryDirectory locally",
+                "Plugin: Hooks to pin autoMemoryDirectory and its link style",
         },
         {
             name: "repo-metadata",
