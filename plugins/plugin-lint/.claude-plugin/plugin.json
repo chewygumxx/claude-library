@@ -1,7 +1,7 @@
 {
     "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
     "name": "plugin-lint",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "displayName": "Plugin Lint",
     "description": "After Claude edits a plugin or marketplace manifest, a hooks file, a skill or an agent, runs claude plugin validate on it and reports any problem back to Claude.",
     "author": {

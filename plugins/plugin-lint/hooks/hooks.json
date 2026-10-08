@@ -2,10 +2,79 @@
     "hooks": {
         "PostToolUse": [
             {
-                "matcher": "Write|Edit",
+                "matcher": "Write",
                 "hooks": [
                     {
                         "type": "command",
+                        "if": "Write(**/.claude-plugin/*.json)",
+                        "command": "sh",
+                        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/plugin-lint.sh"],
+                        "timeout": 30
+                    },
+                    {
+                        "type": "command",
+                        "if": "Write(**/hooks/hooks.json)",
+                        "command": "sh",
+                        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/plugin-lint.sh"],
+                        "timeout": 30
+                    },
+                    {
+                        "type": "command",
+                        "if": "Write(**/SKILL.md)",
+                        "command": "sh",
+                        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/plugin-lint.sh"],
+                        "timeout": 30
+                    },
+                    {
+                        "type": "command",
+                        "if": "Write(**/agents/*.md)",
+                        "command": "sh",
+                        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/plugin-lint.sh"],
+                        "timeout": 30
+                    },
+                    {
+                        "type": "command",
+                        "if": "Write(**/commands/*.md)",
+                        "command": "sh",
+                        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/plugin-lint.sh"],
+                        "timeout": 30
+                    }
+                ]
+            },
+            {
+                "matcher": "Edit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "if": "Edit(**/.claude-plugin/*.json)",
+                        "command": "sh",
+                        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/plugin-lint.sh"],
+                        "timeout": 30
+                    },
+                    {
+                        "type": "command",
+                        "if": "Edit(**/hooks/hooks.json)",
+                        "command": "sh",
+                        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/plugin-lint.sh"],
+                        "timeout": 30
+                    },
+                    {
+                        "type": "command",
+                        "if": "Edit(**/SKILL.md)",
+                        "command": "sh",
+                        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/plugin-lint.sh"],
+                        "timeout": 30
+                    },
+                    {
+                        "type": "command",
+                        "if": "Edit(**/agents/*.md)",
+                        "command": "sh",
+                        "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/plugin-lint.sh"],
+                        "timeout": 30
+                    },
+                    {
+                        "type": "command",
+                        "if": "Edit(**/commands/*.md)",
                         "command": "sh",
                         "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/plugin-lint.sh"],
                         "timeout": 30
