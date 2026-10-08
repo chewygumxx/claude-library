@@ -1,0 +1,22 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    "name": "context7-mcp",
+    "version": "1.0.0",
+    "displayName": "Context7 MCP",
+    "description": "Gives Claude current documentation for libraries and tools, such as Biome, Bun and mise, from the Context7 MCP server.",
+    "author": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/context7-mcp",
+    "license": "GPL-3.0-only",
+    "keywords": ["context7", "mcp", "documentation"],
+    "defaultEnabled": true,
+    "mcpServers": {
+        "context7": {
+            "type": "http",
+            "url": "https://mcp.context7.com/mcp"
+        }
+    }
+}

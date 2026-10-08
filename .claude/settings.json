@@ -14,6 +14,7 @@
         "plugin-dev@claude-plugins-official": true,
 
         "biome-lint@chewygumxx": true,
+        "context7-mcp@chewygumxx": true,
         "common@chewygumxx": true,
         "plugin-lint@chewygumxx": true
     },

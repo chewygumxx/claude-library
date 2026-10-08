@@ -26,6 +26,10 @@
             "source": "./plugins/compact"
         },
         {
+            "name": "context7-mcp",
+            "source": "./plugins/context7-mcp"
+        },
+        {
             "name": "github-mcp",
             "source": "./plugins/github-mcp"
         },
