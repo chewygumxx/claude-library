@@ -1,6 +1,6 @@
 ---
 ctime: 2026-10-03
-mtime: 2026-10-05
+mtime: 2026-10-09
 spdx: GPL-3.0-only
 title: Hook verifier
 name: hook-verifier
@@ -79,6 +79,17 @@ the hook ran; ignore `SessionStart` hooks belonging to other plugins. If a
 tool the hook needs comes from mise, run `claude` under
 `mise exec <tool>@<version> --` with the versions in `mise.toml`, since a
 temporary project has no mise config and the shim would fail.
+
+`--plugin-dir` loads a plugin with `"defaultEnabled": false` but leaves it
+disabled: enable it in the temporary project's `.claude/settings.json`, as
+`{"enabledPlugins": {"<name>@inline": true}}`.
+
+`acceptEdits` still refuses a write into `.claude/` as a sensitive file, and
+permission allow rules do not lift it. For `.claude/memory/`, set
+`autoMemoryDirectory` to it in the project's `.claude/settings.local.json`
+before the run, and add `local` to `--setting-sources`. Use
+`bypassPermissions` only for another `.claude/` path, and only in the
+temporary project.
 
 Keep live runs few: one per handler that should fire, and one near miss per
 `if` filter.
