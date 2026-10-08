@@ -10,12 +10,24 @@
     },
     "plugins": [
         {
-            "name": "common",
-            "source": "./plugins/common"
+            "name": "biome-lint",
+            "source": "./plugins/biome-lint"
         },
         {
             "name": "bun-install",
             "source": "./plugins/bun-install"
+        },
+        {
+            "name": "common",
+            "source": "./plugins/common"
+        },
+        {
+            "name": "compact",
+            "source": "./plugins/compact"
+        },
+        {
+            "name": "github-mcp",
+            "source": "./plugins/github-mcp"
         },
         {
             "name": "header-metadata",
@@ -40,14 +52,6 @@
         {
             "name": "shell-lint",
             "source": "./plugins/shell-lint"
-        },
-        {
-            "name": "github-mcp",
-            "source": "./plugins/github-mcp"
-        },
-        {
-            "name": "compact",
-            "source": "./plugins/compact"
         }
     ]
 }

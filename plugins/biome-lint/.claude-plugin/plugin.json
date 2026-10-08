@@ -1,0 +1,17 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    "name": "biome-lint",
+    "version": "0.0.1",
+    "displayName": "Biome Lint",
+    "description": "After Claude writes or edits a file Biome handles, applies Biome's formatting and safe fixes and reports its remaining diagnostics back to Claude.",
+    "author": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/biome-lint",
+    "license": "GPL-3.0-only",
+    "keywords": ["hooks", "biome", "format", "lint"],
+    "defaultEnabled": false,
+    "hooks": "./hooks/hooks.json"
+}

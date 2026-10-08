@@ -15,6 +15,11 @@ import { defineConfig } from "@chewygumxx/commitlint-config";
 export default defineConfig({
     scopes: [
         {
+            name: "biome-lint",
+            fullName: "Biome Lint",
+            description: "Plugin: PostToolUse hook running Biome",
+        },
+        {
             name: "common",
             fullName: "Common",
             description: "Ubiquitous baseline plugins of minimal token demand",
