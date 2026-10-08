@@ -49,4 +49,13 @@ if [[ "$cur" != "$dir" ]]; then
     trap 'rm -f -- "$tmp"' EXIT
     jq --arg d "$dir" '.autoMemoryDirectory = $d' "$settings" >"$tmp"
     mv -- "$tmp" "$settings"
+
+    # Settings are read before SessionStart hooks run, so this session keeps
+    # the default memory directory. Tell the user, not Claude: a
+    # systemMessage costs no context.
+    jq -n --arg d "$dir" '{
+        systemMessage: ("repo-memory: autoMemoryDirectory now points at " + $d
+            + ", from the next session. Until then, memory stays in the default"
+            + " directory, and writes into .claude/memory are refused.")
+    }'
 fi

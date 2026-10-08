@@ -67,6 +67,23 @@ checkout. In the shared `.claude/settings.json` it would publish a home
 directory path and be rewritten by every other clone or worktree. The hook
 therefore refuses to write `.claude/settings.local.json` unless git ignores it.
 
+## The first session
+
+Claude Code reads its settings before `SessionStart` hooks run, so the
+session in which the hook first pins `autoMemoryDirectory`, the first in a
+fresh clone or worktree, keeps the default memory directory: memories it
+saves land under `~/.claude/projects/`, and Claude Code refuses writes into
+`.claude/memory/` as a sensitive file. The hook says so then, to the user
+alone; the next session uses the repository's memory.
+
+A headless driver sees no such message, and permission allow rules do not
+lift the refusal. Pin the directory before the first session instead, by
+running the hook from the project:
+
+```sh
+bash <plugin>/hooks/sync-auto-memory-dir.sh
+```
+
 Requires `jq`.
 
 <!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->
