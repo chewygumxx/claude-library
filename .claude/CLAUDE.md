@@ -1,6 +1,6 @@
 ---
 ctime: 2026-09-29
-mtime: 2026-10-05
+mtime: 2026-10-09
 spdx: GPL-3.0-only
 title: CLAUDE.md
 description: >-
@@ -30,14 +30,6 @@ as `type(scope): Sentence-case subject`, and body lines of at most 72. Scopes
 are those in `.commitlintrc.mts`, one per plugin, and are omitted for changes
 beyond a single plugin. Changes to the project's own Claude Code assets in
 `.claude/` take the `ai` type, unscoped, as `ai: Subject`.
-
-When appropriate and worthwhile to compact, append the following
-newline-delimited items to your response:
-
-- A `/compact <summary>`
-- Appraisal rating scaled 1-100
-- Risk assessment rating scaled 1-100
-- Terse single-sentence justification.
 
 ## Conventions
 
