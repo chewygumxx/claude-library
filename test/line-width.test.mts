@@ -332,4 +332,28 @@ describe("line-width segment: deferred fixes", () => {
         expect(segment(text, COLUMNS)).toEqual([prose(text)]);
         expect(segment("a | b\n---", COLUMNS)).toEqual([prose("a | b\n---")]);
     });
+
+    test("a rest that would draw a rule or open a fence is escaped", () => {
+        expect(segment(`${LONG} ***`, COLUMNS)).toEqual([
+            wide(LONG),
+            prose("\\***"),
+        ]);
+        expect(segment(`${LONG} ___`, COLUMNS)).toEqual([
+            wide(LONG),
+            prose("\\___"),
+        ]);
+        expect(segment(`${LONG} \`\`\`js`, COLUMNS)).toEqual([
+            wide(LONG),
+            prose("\\```js"),
+        ]);
+    });
+
+    test("a setext heading is never cut", () => {
+        for (const text of [
+            `See ${LONG} now\n---`,
+            `Top\nSee ${LONG} now\n===`,
+        ]) {
+            expect(segment(text, COLUMNS)).toEqual([prose(text)]);
+        }
+    });
 });

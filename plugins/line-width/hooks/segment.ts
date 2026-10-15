@@ -28,6 +28,8 @@ const DELIMITER_CELL = /^\s*:?-+:?\s*$/;
 const LIST_ITEM = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/;
 // Three or more of one of `-`, `*` or `_`, spaces between allowed.
 const THEMATIC_BREAK = /^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/;
+const SETEXT_UNDERLINE = /^ {0,3}(?:=+|-+)[ \t]*$/;
+const HEADING = /^ {0,3}#{1,6}(?:[ \t]|$)/;
 const QUOTE = /^[ \t]*(?:>[ \t]?)+/;
 // A delimiter run that may open emphasis: up to three `*` or `_`, or `~~`.
 const EMPHASIS_OPEN = /^(\*{1,3}|_{1,3}|~~)(?=[^\s/])/;
@@ -44,6 +46,7 @@ type Token = { start: number; end: number; drawn: string };
 
 export function segment(text: string, columns: number): Piece[] {
     const lines = text.split(/\r?\n/);
+    const isHeading = setextBodies(lines);
     const pieces: Piece[] = [];
     let gap = false;
     let inList = false;
@@ -95,7 +98,10 @@ export function segment(text: string, columns: number): Piece[] {
         // Once a cut has left a list's text in padded pieces, its indented
         // lines are padded too, or they would fall to the margin.
         const shift = isCut ? leading(line) : 0;
-        const units = lineUnits(line.slice(shift), columns - shift, inList);
+        // A setext heading's lines draw as one heading, so none is cut.
+        const units: Unit[] = isHeading[i]
+            ? [{ kind: "prose", text: line, indent: 0 }]
+            : lineUnits(line.slice(shift), columns - shift, inList);
         for (const unit of units) {
             add({ ...unit, indent: unit.indent + shift });
         }
@@ -103,6 +109,33 @@ export function segment(text: string, columns: number): Piece[] {
         i += 1;
     }
     return pieces;
+}
+
+// Which lines are a setext heading's text: the paragraph lines above an
+// underline of `=` or `-`.
+function setextBodies(lines: string[]): boolean[] {
+    const marked = lines.map(() => false);
+    for (const [j, line] of lines.entries()) {
+        if (!SETEXT_UNDERLINE.test(line)) {
+            continue;
+        }
+        for (let k = j - 1; k >= 0 && isParagraphLine(lines[k] ?? ""); k -= 1) {
+            marked[k] = true;
+        }
+    }
+    return marked;
+}
+
+// Whether a line can be paragraph text: not blank, and opening no other
+// block.
+function isParagraphLine(line: string): boolean {
+    return (
+        line.trim() !== "" &&
+        leading(line) <= 3 &&
+        ![LIST_ITEM, QUOTE, THEMATIC_BREAK, FENCE, HEADING].some((pattern) =>
+            pattern.test(line),
+        )
+    );
 }
 
 // The line after the fence opened at `start` closes, or the block's end.
@@ -336,8 +369,12 @@ function isLong(drawn: string, room: number): boolean {
     );
 }
 
-// Keeps a part after a cut from opening a list, heading or quote.
+// Keeps a part after a cut from opening a list, heading, quote or fence,
+// or from drawing a rule.
 function escapeLead(text: string): string {
+    if (THEMATIC_BREAK.test(text) || FENCE.test(text)) {
+        return `\\${text}`;
+    }
     const ordered = /^\d{1,9}(?=[.)](?:\s|$))/.exec(text)?.[0];
     if (ordered !== undefined) {
         return `${ordered}\\${text.slice(ordered.length)}`;
