@@ -26,6 +26,7 @@ const FENCE = /^[ \t]*(`{3,}|~{3,})/;
 const FENCE_CLOSE = /^[ \t]*(`{3,}|~{3,})[ \t]*$/;
 const DELIMITER_ROW = /^\|?(?:\s*:?-+:?\s*\|)*\s*:?-+:?\s*\|?$/;
 const LIST_ITEM = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/;
+const QUOTE = /^[ \t]*(?:>[ \t]?)+/;
 const LINK = /^!?\[([^\]\n]*)\]\([^()\s]*\)/;
 const AUTOLINK = /^<([a-z][a-z0-9+.-]*:[^<>\s]*)>/i;
 // East Asian Wide and Fullwidth ranges, and emoji: two cells each.
@@ -126,20 +127,38 @@ function leading(line: string): number {
     return line.length - line.trimStart().length;
 }
 
-// A prose line as units: itself, or the parts a long token cuts it into.
+// A prose line as units: itself, or the parts a long token cuts it into,
+// each carrying the line's context: a list item's marker stays with the
+// first part and later parts sit under its text, a continuation line's
+// indent becomes padding, and every part of a quote keeps the bar.
 function lineUnits(line: string, columns: number, inList: boolean): Unit[] {
-    if (!inList && leading(line) >= 4) {
+    const quote = QUOTE.exec(line)?.[0];
+    const item = quote === undefined ? LIST_ITEM.exec(line)?.[0] : undefined;
+    const lead = leading(line);
+    const isPlain = quote === undefined && item === undefined;
+    if (isPlain && !inList && lead >= 4) {
         return [{ kind: "prose", text: line, indent: 0 }];
     }
-    const parts = cut(line, columns);
+    const isContinuation = isPlain && inList && lead > 0;
+    const marker = quote ?? item ?? (isContinuation ? line.slice(0, lead) : "");
+    const parts = cut(line.slice(marker.length), columns - marker.length);
     if (parts.length === 1 && parts[0]?.kind === "prose") {
         return [{ kind: "prose", text: line, indent: 0 }];
     }
-    return parts.map((part, index) => ({
-        kind: part.kind,
-        text: index === 0 ? part.text : escapeLead(part.text),
-        indent: 0,
-    }));
+    const bar =
+        quote === undefined ? "" : "> ".repeat(quote.split(">").length - 1);
+    return parts.map((part, index) => {
+        const text = index === 0 ? part.text : escapeLead(part.text);
+        if (quote !== undefined) {
+            return { kind: part.kind, text: `${bar}${text}`, indent: 0 };
+        }
+        if (item !== undefined) {
+            return index === 0
+                ? { kind: part.kind, text: `${item}${text}`, indent: 0 }
+                : { kind: part.kind, text, indent: item.length };
+        }
+        return { kind: part.kind, text, indent: isContinuation ? lead : 0 };
+    });
 }
 
 // Cuts content around its first long token outside emphasis, then the rest

@@ -183,3 +183,50 @@ describe("line-width segment: long tokens", () => {
         expect(segment(line, COLUMNS)).toEqual([prose(line)]);
     });
 });
+
+describe("line-width segment: context across a cut", () => {
+    test("a list item keeps its marker; later parts sit under it", () => {
+        expect(segment(`- See ${LONG} now`, COLUMNS)).toEqual([
+            prose("- See"),
+            wide(LONG, 2),
+            prose("now", 2),
+        ]);
+    });
+
+    test("a continuation line's indent becomes padding", () => {
+        expect(segment(`- Item\n  more ${LONG} end`, COLUMNS)).toEqual([
+            prose("- Item"),
+            prose("more", 2),
+            wide(LONG, 2),
+            prose("end", 2),
+        ]);
+    });
+
+    test("a nested item stays in its list", () => {
+        expect(segment(`- Top\n  - See ${LONG}`, COLUMNS)).toEqual([
+            prose("- Top\n  - See"),
+            wide(LONG, 4),
+        ]);
+    });
+
+    test("a blockquote's parts each keep the bar", () => {
+        expect(segment(`> See ${LONG} now`, COLUMNS)).toEqual([
+            prose("> See"),
+            wide(`> ${LONG}`),
+            prose("> now"),
+        ]);
+    });
+
+    test("a nested quote keeps its depth", () => {
+        expect(segment(`> > See ${LONG}`, COLUMNS)).toEqual([
+            prose("> > See"),
+            wide(`> > ${LONG}`),
+        ]);
+    });
+
+    test("an item's room is the measure less its marker", () => {
+        // 19 cells: within 20, over the 18 a "- " item leaves.
+        const word = "abcdefghijabcdefghi";
+        expect(segment(`- ${word}`, COLUMNS)).toEqual([wide(`- ${word}`)]);
+    });
+});
