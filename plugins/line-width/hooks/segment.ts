@@ -267,7 +267,16 @@ function lineUnits(
         return [{ kind: "prose", text: line, indent: 0 }];
     }
     const isContinuation = isPlain && inList && lead > 0;
-    const marker = quote ?? item ?? (isContinuation ? line.slice(0, lead) : "");
+    // An item inside a quote: padding would move the bar too, so its later
+    // parts are indented with no-break spaces, which markdown keeps.
+    const quoted =
+        quote === undefined
+            ? undefined
+            : LIST_ITEM.exec(line.slice(quote.length))?.[0];
+    const marker =
+        quote === undefined
+            ? (item ?? (isContinuation ? line.slice(0, lead) : ""))
+            : `${quote}${quoted ?? ""}`;
     const parts = cut(
         line.slice(marker.length),
         columns - marker.length,
@@ -280,8 +289,17 @@ function lineUnits(
         quote === undefined ? "" : "> ".repeat(quote.split(">").length - 1);
     return parts.map((part, index) => {
         const text = index === 0 ? part.text : escapeLead(part.text);
+        if (quoted !== undefined && index > 0) {
+            const pad = "\u00a0".repeat(quoted.length);
+            return {
+                kind: part.kind,
+                text: `${bar}${pad}${part.text}`,
+                indent: 0,
+            };
+        }
         if (quote !== undefined) {
-            return { kind: part.kind, text: `${bar}${text}`, indent: 0 };
+            const head = index === 0 ? marker : bar;
+            return { kind: part.kind, text: `${head}${text}`, indent: 0 };
         }
         if (item !== undefined) {
             return index === 0

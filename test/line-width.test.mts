@@ -385,4 +385,17 @@ describe("line-width segment: deferred fixes", () => {
             prose("here**"),
         ]);
     });
+
+    test("a quoted item's later parts sit under its text", () => {
+        const pad = "\u00a0\u00a0";
+        expect(segment(`> - See ${LONG} now`, COLUMNS)).toEqual([
+            prose("> - See"),
+            wide(`> ${pad}${LONG}`),
+            prose(`> ${pad}now`),
+        ]);
+        expect(segment(`> > 1. See ${LONG}`, COLUMNS)).toEqual([
+            prose("> > 1. See"),
+            wide(`> > \u00a0\u00a0\u00a0${LONG}`),
+        ]);
+    });
 });
