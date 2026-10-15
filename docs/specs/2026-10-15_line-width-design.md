@@ -111,8 +111,10 @@ type Piece = {
 ```
 
 `indent` is drawn as padding and `gapBefore` as one blank row; neither is
-written into `text`. Adjacent pieces of one kind and indent, with no gap
-between them, are merged.
+written into `text`. Adjacent `prose` pieces of one indent are merged,
+keeping any blank line between them in `text`, so a reply of several
+paragraphs is one piece. `wide` pieces are never merged: two of them
+written together could read as other markdown.
 
 ### Blocks
 
@@ -158,9 +160,11 @@ long token outside cuts the line into three parts:
 3. the rest of the line, leading whitespace trimmed: `prose`, dropped when
    blank, and read again for further long tokens
 
-A part after the first that would open block syntax has its first
-character escaped with a backslash: a leading `-`, `+`, `*`, `#`, `>` or
-`|`, or digits followed by `.` or `)`.
+A part after the first that would open block syntax is escaped with a
+backslash: a leading `-`, `+` or `*` followed by a space, one to six `#`
+followed by a space, a `>`, or digits followed by `.` or `)` and a space,
+the backslash going before the `.` or `)`. Emphasis such as `**bold**` is
+left alone, and a lone `|` cannot open a table without a delimiter row.
 
 ### Context across a cut
 
