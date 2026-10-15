@@ -243,6 +243,11 @@ function tokens(line: string): Token[] {
             } else if (autolink) {
                 drawn += autolink[1] ?? "";
                 i += autolink[0].length;
+            } else if (char === "`") {
+                // An unmatched run is literal, the whole run at once.
+                const run = /^`+/.exec(line.slice(i))?.[0] ?? char;
+                drawn += run;
+                i += run.length;
             } else {
                 drawn += char;
                 i += 1;

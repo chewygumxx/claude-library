@@ -283,3 +283,13 @@ describe("line-width segment: review fixes", () => {
         ]);
     });
 });
+
+describe("line-width segment: deferred fixes", () => {
+    test("an unmatched backtick run is one literal unit", () => {
+        expect(segment(`Run \`\`${LONG} \` x`, COLUMNS)).toEqual([
+            prose("Run"),
+            wide(`\`\`${LONG}`),
+            prose("` x"),
+        ]);
+    });
+});
