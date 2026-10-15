@@ -307,4 +307,14 @@ describe("line-width segment: deferred fixes", () => {
         expect(segment(text, COLUMNS)).toEqual([prose(text)]);
         expect(performance.now() - start).toBeLessThan(500);
     });
+
+    test("a thematic break is no list item", () => {
+        const text = `* * *\n    ${LONG}`;
+        expect(segment(text, COLUMNS)).toEqual([prose(text)]);
+    });
+
+    test("a pipe block indented as code is no table", () => {
+        const text = "Text\n\n    | a |\n    | - |";
+        expect(segment(text, COLUMNS)).toEqual([prose(text)]);
+    });
 });

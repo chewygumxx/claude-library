@@ -26,6 +26,8 @@ const FENCE = /^[ \t]*(`{3,}|~{3,})/;
 const FENCE_CLOSE = /^[ \t]*(`{3,}|~{3,})[ \t]*$/;
 const DELIMITER_ROW = /^\|?(?:\s*:?-+:?\s*\|)*\s*:?-+:?\s*\|?$/;
 const LIST_ITEM = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/;
+// Three or more of one of `-`, `*` or `_`, spaces between allowed.
+const THEMATIC_BREAK = /^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/;
 const QUOTE = /^[ \t]*(?:>[ \t]?)+/;
 // A delimiter run that may open emphasis: up to three `*` or `_`, or `~~`.
 const EMPHASIS_OPEN = /^(\*{1,3}|_{1,3}|~~)(?=[^\s/])/;
@@ -77,7 +79,7 @@ export function segment(text: string, columns: number): Piece[] {
             i = end;
             continue;
         }
-        if (i >= plainUntil) {
+        if (i >= plainUntil && (leading(line) <= 3 || inList)) {
             const [end, isTable] = tableEnd(lines, i);
             if (isTable) {
                 add(block(lines.slice(i, end), "wide"));
@@ -87,7 +89,9 @@ export function segment(text: string, columns: number): Piece[] {
             // A pipe run with no delimiter row is prose to its end.
             plainUntil = end;
         }
-        if (LIST_ITEM.test(line)) {
+        if (THEMATIC_BREAK.test(line)) {
+            inList = false;
+        } else if (LIST_ITEM.test(line)) {
             inList = true;
         } else if (leading(line) === 0) {
             inList = false;
