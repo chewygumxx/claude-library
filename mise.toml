@@ -87,6 +87,41 @@ for target in . .claude plugins/*/; do
 done
 """
 
+[tasks."test:plugins"]
+#
+# Runs `claude plugin test` on each plugin of function hooks that holds
+# tests, against the engine itself. The CLI is this task's own, as for
+# `lint:plugins`.
+#
+description = "Test the plugins' function hooks"
+tools       = { "aqua:anthropics/claude-code" = "2" }
+run         = """
+for target in plugins/*/; do
+    [ -n "$(find "$target" -name '*.test.ts' -o -name '*.test.tsx' | head -n 1)" ] || continue
+    claude plugin test "$target"
+done
+"""
+
+[tasks."typecheck:plugins"]
+#
+# Type-checks each plugin holding a `tsconfig.json`, which extends the
+# types the engine writes into `.claude-plugin/types/` when it loads the
+# plugin. Git ignores those, so a checkout that never loaded the plugin,
+# CI among them, skips it with a note.
+#
+description = "Type-check the plugins' function hooks"
+run         = """
+for config in plugins/*/tsconfig.json; do
+    [ -e "$config" ] || continue
+    target=${config%/tsconfig.json}
+    if [ ! -e "$target/.claude-plugin/types/tsconfig.json" ]; then
+        printf 'typecheck:plugins: skipped %s, its engine-written types absent\\n' "$target" >&2
+        continue
+    fi
+    tsc -p "$config"
+done
+"""
+
 [tasks.test]
 #
 # Runs each plugin hook script against crafted payloads in temporary
