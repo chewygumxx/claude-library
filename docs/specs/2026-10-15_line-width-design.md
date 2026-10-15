@@ -1,6 +1,6 @@
 ---
 ctime: 2026-10-15
-mtime: 2026-10-15
+mtime: 2026-10-16
 spdx: GPL-3.0-only
 title: "Line Width: design"
 description: >-
@@ -151,6 +151,10 @@ width exceeds the room its line has: `columns` less the line's content
 column (below).
 
 A line is cut only at whitespace outside every emphasis opened before it.
+Emphasis opens at a token beginning with up to three `*` or `_`, or with
+`~~`, followed by neither whitespace nor `/`, and only where a later token
+of the line ends with the same run: `~/path`, `__init__.py` and `**/*.ts`
+open none.
 A long token inside open emphasis stays in its prose and wraps there. A
 long token outside cuts the line into three parts:
 
@@ -178,6 +182,10 @@ line had:
 - Continuation line: a line indented under a list item takes its leading
   whitespace as its content column, stripped from its text and carried as
   `indent`, so four or more spaces never read as code
+- After a cut: once a line of a list has been cut, each later indented
+  line of that list, item or continuation, is stripped of its leading
+  whitespace and carried as `indent`, until a line at the margin ends the
+  list, so the item's text and nested items stay under it
 - Blockquote: every part is prefixed with the line's own quote markers
   (`>` or `> >`) and a space, `indent` 0, so the bar continues
 
@@ -187,8 +195,9 @@ line had:
 `Text` and `Markdown` taken from `$.ui.resolve(e)`:
 
 1. Pass through, `return next(e)`, when the surface is not `terminal`,
-   when `e.props.isSummary` is set, or when `e.viewport` is absent or its
-   `columns` is at most `columns + 2`
+   when `e.props.isSummary` is set, when `e.viewport` is absent or its
+   `columns` is at most `columns + 2`, or when the text is over 90,000
+   characters: a tree draws only the first 100,000 characters of its texts
 2. Segment the text. No piece, or one `wide` piece, the whole block a
    table or a fence, passes through too
 3. Otherwise the hook draws the block itself and never calls `next`. Each
