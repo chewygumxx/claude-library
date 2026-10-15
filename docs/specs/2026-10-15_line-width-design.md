@@ -123,10 +123,19 @@ written together could read as other markdown.
   matching close, or to the end of the block when unclosed, is `wide`. Its
   lines' common leading whitespace is stripped and becomes its `indent`, so
   a fence inside a numbered step stays under the step's text
-- Table: a run of lines whose first non-blank character is `|`, holding a
-  delimiter row (`| --- |`, colons allowed), is `wide`, its common leading
-  whitespace taken as its `indent` the same way. A run without a delimiter
-  row is `prose`
+- Table: as GitHub reads one, a header row holding a `|`, then a
+  delimiter row holding a `|` and as many cells, each of hyphens with
+  colons allowed, then each following line holding a `|`, up to a blank
+  line. Leading and trailing pipes are optional. It is `wide` at up to
+  three spaces' indent, or any within a list item, its common leading
+  whitespace taken as its `indent` the same way. A header whose delimiter
+  row is missing or has another count of cells, as while it streams, is
+  `prose`
+- Thematic break: three or more of one of `-`, `*` or `_`, spaces between
+  allowed, is `prose` and ends a list; it is never read as a list item
+- Heading: an ATX heading line (`#` to `######`) and each line of a setext
+  heading's text (the paragraph above a line of `=` or `-`) is `prose` and
+  never cut, so its style holds on its every line
 - Every other line is `prose`, `indent` 0, read for long words as below
 
 `gapBefore` is set on a piece whose first source line follows a blank
@@ -137,16 +146,21 @@ line.
 A line is read as a run of tokens, each one of:
 
 - a code span: a run of backticks to the next run of the same length,
-  spaces inside included; drawn width, its content's
+  spaces inside included; drawn width, its content's. A run no run of the
+  same length closes is literal, the whole run at once
 - a link or image, `[label](target)` or `![alt](target)`: drawn width, the
-  label's or the alt's; the target is never drawn and never counted
+  label's or the alt's; the target is never drawn and never counted. The
+  target may be in angle brackets, may hold parentheses a level deep, and
+  may be followed by a title in quotes or parentheses
 - an autolink, `<scheme:...>`: drawn width, what lies between the angle
   brackets
 - a word: a run of other non-whitespace; drawn width, its length less
   emphasis markers (`*`, `_`, `~`) and trailing punctuation (`.,;:!?)`)
 
-Widths are in terminal cells. A token holding a wide character (East Asian
-Wide or Fullwidth) is never long. Any other token is long when its drawn
+Widths are in terminal cells: combining marks, joiners and variation
+selectors take none. A token holding a wide character (East Asian Wide or
+Fullwidth, an emoji drawn as emoji, or a pictograph followed by U+FE0F)
+is never long. Any other token is long when its drawn
 width exceeds the room its line has: `columns` less the line's content
 column (below).
 
@@ -154,7 +168,9 @@ A line is cut only at whitespace outside every emphasis opened before it.
 Emphasis opens at a token beginning with up to three `*` or `_`, or with
 `~~`, followed by neither whitespace nor `/`, and only where a later token
 of the line ends with the same run: `~/path`, `__init__.py` and `**/*.ts`
-open none.
+open none. Emphasis left open at a line's end carries to the paragraph's
+next line, where a token of a later line may close it; a blank line or a
+new block ends it.
 A long token inside open emphasis stays in its prose and wraps there. A
 long token outside cuts the line into three parts:
 
@@ -167,8 +183,12 @@ long token outside cuts the line into three parts:
 A part after the first that would open block syntax is escaped with a
 backslash: a leading `-`, `+` or `*` followed by a space, one to six `#`
 followed by a space, a `>`, or digits followed by `.` or `)` and a space,
-the backslash going before the `.` or `)`. Emphasis such as `**bold**` is
-left alone, and a lone `|` cannot open a table without a delimiter row.
+the backslash going before the `.` or `)`. So is a part that would draw a
+thematic break (`***`, `___`) or open a fence. Emphasis such as `**bold**`
+is left alone, and a lone `|` cannot open a table without a delimiter row.
+
+Cutting reads each line once, so a reply redrawn on every streamed token
+is segmented in time linear in its length.
 
 ### Context across a cut
 
@@ -188,6 +208,9 @@ line had:
   list, so the item's text and nested items stay under it
 - Blockquote: every part is prefixed with the line's own quote markers
   (`>` or `> >`) and a space, `indent` 0, so the bar continues
+- List item inside a blockquote: padding would move the bar too, so each
+  later part is indented with no-break spaces, one per column of the
+  item's marker, which markdown draws rather than strips
 
 ## Drawing
 
