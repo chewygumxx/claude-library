@@ -35,8 +35,8 @@ leaving tables, code fences and over-long words at the terminal's width.
 
 **Architecture:** One `ui.render` hook on `AssistantMessage`. A pure
 `segment()` cuts the reply's markdown into `prose` and `wide` pieces; the
-hook draws each through the engine's own drawing (`next`) inside a `Box`
-of the measure (prose) or of no width (wide).
+hook draws each as its own `Markdown` inside a `Box` of the measure
+(prose) or of no width (wide), beside a bullet of its own.
 
 **Tech Stack:** Claude Code 2.1.300 function hooks (TSX, `claude-code`
 types, `claude-code/testing`), Bun 1.4 (`bun test`), TypeScript, Biome,
@@ -1060,6 +1060,10 @@ git commit -m "feat(line-width): Keep list and quote context in cuts"
 
 ### Task 6: Draw the pieces in the hook
 
+Revised after Task 1's probe: the engine refuses its own drawing under a
+`Box` with a width, so each piece is the mod's own `Markdown` and the
+hook draws the bullet itself.
+
 **Files:**
 
 - Modify: `plugins/line-width/hooks/register.tsx`
@@ -1100,6 +1104,11 @@ type Props = RenderPropsOf["AssistantMessage"];
 
 const WIDE: RenderViewport = { columns: 200, rows: 50 };
 const TABLE = "| a | b |\n| --- | --- |\n| 1 | 2 |";
+const BULLET = {
+    type: "Box",
+    props: { width: 2 },
+    children: [{ type: "Text", props: { color: "text" } }],
+};
 
 // Stands beneath the plugin for the engine: records the props of each
 // drawing asked of it and answers a marker.
@@ -1136,6 +1145,15 @@ async function draw(
         ...(viewport === null ? {} : { viewport }),
     });
     return ui.drawn();
+}
+
+// A piece as drawn: its Box and the one Markdown in it.
+function piece(text: string, props: Record<string, unknown>) {
+    return {
+        type: "Box",
+        props,
+        children: [{ type: "Markdown", props: { text } }],
+    };
 }
 
 describe("line-width hook", () => {
@@ -1181,52 +1199,70 @@ describe("line-width hook", () => {
         expect(calls.map((call) => call.text)).toEqual([TABLE, url]);
     });
 
-    test("boxes plain prose to the measure and gutter", async ($, on) => {
+    test("draws plain prose at the measure beside the bullet", async ($, on) => {
         const calls = engine(on);
         expect(await draw($, "Plain prose.")).toMatchObject({
             type: "Box",
-            props: { width: 82 },
-            children: [{ type: "Text" }],
-        });
-        expect(calls.length).toBe(1);
-    });
-
-    test("draws each piece through the engine", async ($, on) => {
-        const calls = engine(on);
-        const tree = await draw($, `Before\n\n${TABLE}\n\nAfter`, {
-            props: { onScreen: null },
-        });
-        expect(
-            calls.map((call) => [call.text, call.isFirstOfReply, call.onScreen]),
-        ).toEqual([
-            ["Before", true, null],
-            [TABLE, false, null],
-            ["After", false, null],
-        ]);
-        expect(tree).toMatchObject({
-            type: "Box",
-            props: { flexDirection: "column" },
+            props: { flexDirection: "row", marginTop: 1 },
             children: [
-                { type: "Box", props: { width: 82, marginTop: 0 } },
-                { type: "Box", props: { marginTop: 1 } },
-                { type: "Box", props: { width: 82, marginTop: 1 } },
+                BULLET,
+                {
+                    type: "Box",
+                    props: { flexDirection: "column" },
+                    children: [piece("Plain prose.", { width: 80 })],
+                },
             ],
         });
-        const [, table] = (
-            tree as { children: { props: Record<string, unknown> }[] }
-        ).children;
+        expect(calls.length).toBe(0);
+    });
+
+    test("draws each piece in order", async ($, on) => {
+        engine(on);
+        const tree = await draw($, `Before\n\n${TABLE}\n\nAfter`);
+        expect(tree).toMatchObject({
+            children: [
+                BULLET,
+                {
+                    children: [
+                        piece("Before", { width: 80, marginTop: 0 }),
+                        piece(TABLE, { marginTop: 1 }),
+                        piece("After", { width: 80, marginTop: 1 }),
+                    ],
+                },
+            ],
+        });
+        const [, column] = (tree as { children: { children: unknown[] }[] })
+            .children;
+        const [, table] = column?.children as { props: { width?: number } }[];
         expect(table?.props.width).toBe(undefined);
     });
 
     test("pads a piece by its indent", async ($, on) => {
         engine(on);
-        const tree = await draw($, `- See ${"/a".repeat(50)} now`);
+        const path = "/a".repeat(50);
+        const tree = await draw($, `- See ${path} now`);
         expect(tree).toMatchObject({
             children: [
-                { props: { paddingLeft: 0 } },
-                { props: { paddingLeft: 2 } },
-                { props: { paddingLeft: 2, width: 82 } },
+                BULLET,
+                {
+                    children: [
+                        piece("- See", { paddingLeft: 0 }),
+                        piece(path, { paddingLeft: 2 }),
+                        piece("now", { paddingLeft: 2, width: 80 }),
+                    ],
+                },
             ],
+        });
+    });
+
+    test("leaves the bullet off a later block of a reply", async ($, on) => {
+        engine(on);
+        const tree = await draw($, "Plain prose.", {
+            props: { isFirstOfReply: false },
+        });
+        expect(tree).toMatchObject({
+            type: "Box",
+            children: [{ props: { flexDirection: "column" } }],
         });
     });
 
@@ -1236,8 +1272,10 @@ describe("line-width hook", () => {
         async ($, on) => {
             engine(on);
             expect(await draw($, "Plain prose.")).toMatchObject({
-                type: "Box",
-                props: { width: 62 },
+                children: [
+                    BULLET,
+                    { children: [piece("Plain prose.", { width: 60 })] },
+                ],
             });
         },
     );
@@ -1247,9 +1285,9 @@ describe("line-width hook", () => {
 - [ ] **Step 2: Run them to see them fail**
 
 Run: `claude plugin test plugins/line-width`
-Expected: the pass-through cases PASS; "boxes plain prose", "draws each
-piece", "pads a piece" and "honours the columns option" FAIL, the tree
-being the engine's `Text`.
+Expected: the six pass-through cases PASS; "draws plain prose", "draws
+each piece", "pads a piece", "leaves the bullet off" and "honours the
+columns option" FAIL, the tree being the engine's `Text`.
 
 - [ ] **Step 3: Write the hook**
 
@@ -1259,8 +1297,9 @@ header with:
 ```tsx
 // Wraps the assistant's replies in the terminal at whitespace to the
 // measure, leaving tables, code fences and words too long for it at the
-// terminal's width. Each piece is drawn by the engine itself, so the
-// bullet, colours and links stay its own; only the boxes are the mod's.
+// terminal's width. The engine refuses its own drawing under a Box with a
+// width, so each piece is drawn as the mod's own Markdown, as a reply is,
+// beside a bullet drawn as the engine draws its own.
 
 import type { Register, RenderElement } from "claude-code";
 import { segment } from "./segment.ts";
@@ -1271,10 +1310,9 @@ const GUTTER = 2;
 export const register: Register = (on, options) => {
     const columns =
         typeof options.columns === "number" ? options.columns : 80;
-    const measure = columns + GUTTER;
 
-    on("ui.render", { component: "AssistantMessage" }, async ($, e, next) => {
-        const isRoomy = (e.viewport?.columns ?? 0) > measure;
+    on("ui.render", { component: "AssistantMessage" }, ($, e, next) => {
+        const isRoomy = (e.viewport?.columns ?? 0) > columns + GUTTER;
         if (e.surface !== "terminal" || e.props.isSummary || !isRoomy) {
             return next(e);
         }
@@ -1286,40 +1324,42 @@ export const register: Register = (on, options) => {
         ) {
             return next(e);
         }
-        const { Box } = $.ui.resolve(e);
-        if (pieces.length === 1 && first.indent === 0) {
-            return <Box width={measure}>{await next(e)}</Box>;
-        }
-        const drawn: RenderElement[] = [];
-        for (const [i, piece] of pieces.entries()) {
-            const isFirstOfReply = i === 0 && e.props.isFirstOfReply;
-            const tree = await next({
-                ...e,
-                props: { ...e.props, text: piece.text, isFirstOfReply },
-            });
-            const width = piece.kind === "prose" ? { width: measure } : {};
-            drawn.push(
+        const { Box, Text, Markdown } = $.ui.resolve(e);
+        const drawn = pieces.map((piece) => {
+            const width = piece.kind === "prose" ? { width: columns } : {};
+            return (
                 <Box
                     {...width}
                     paddingLeft={piece.indent}
                     marginTop={piece.gapBefore ? 1 : 0}
                 >
-                    {tree}
-                </Box>,
+                    <Markdown text={piece.text} />
+                </Box>
             );
-        }
-        return <Box flexDirection="column">{drawn}</Box>;
+        });
+        const column = <Box flexDirection="column">{drawn}</Box>;
+        // The engine draws no bullet and no gutter on a later block.
+        const row: RenderElement[] = e.props.isFirstOfReply
+            ? [
+                  <Box width={GUTTER}>
+                      <Text color="text">●</Text>
+                  </Box>,
+                  column,
+              ]
+            : [column];
+        return (
+            <Box flexDirection="row" marginTop={1}>
+                {row}
+            </Box>
+        );
     });
 };
 ```
 
-If Task 1 found the engine keeps its own paragraph spacing, write
-`marginTop={0}` instead and drop `marginTop` from the test's expectations.
-
 - [ ] **Step 4: Run the tests to see them pass**
 
 Run: `claude plugin test plugins/line-width`
-Expected: PASS, 10 tests.
+Expected: PASS, 11 tests.
 
 - [ ] **Step 5: Validate, type-check, lint and commit**
 
