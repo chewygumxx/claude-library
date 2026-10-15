@@ -34,7 +34,10 @@ const QUOTE = /^[ \t]*(?:>[ \t]?)+/;
 // A delimiter run that may open emphasis: up to three `*` or `_`, or `~~`.
 const EMPHASIS_OPEN = /^(\*{1,3}|_{1,3}|~~)(?=[^\s/])/;
 const EMPHASIS_RUNS = ["*", "**", "***", "_", "__", "___", "~~"];
-const LINK = /!?\[([^\]\n]*)\]\([^()\s]*\)/y;
+// A link or image: its label, then a target in angle brackets or one
+// holding balanced parentheses a level deep, and an optional title.
+const LINK =
+    /!?\[([^\]\n]*)\]\(\s*(?:<[^<>\n]*>|(?:[^()\s]|\([^()\s]*\))*)(?:\s+(?:"[^"\n]*"|'[^'\n]*'|\([^()\n]*\)))?\s*\)/y;
 const BACKTICKS = /`+/y;
 const AUTOLINK = /<([a-z][a-z0-9+.-]*:[^<>\s]*)>/iy;
 // East Asian Wide and Fullwidth ranges, and emoji: two cells each.

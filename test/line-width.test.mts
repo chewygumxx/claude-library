@@ -356,4 +356,15 @@ describe("line-width segment: deferred fixes", () => {
             expect(segment(text, COLUMNS)).toEqual([prose(text)]);
         }
     });
+
+    test("a link with a title, angle target or parentheses is one token", () => {
+        for (const line of [
+            `See [x](${URL} "A title") now`,
+            `See [x](${URL} 'A title') now`,
+            `See [x](<${URL}/a b>) now`,
+            "See [x](https://example.com/wiki/Foo_(bar)) now",
+        ]) {
+            expect(segment(line, COLUMNS)).toEqual([prose(line)]);
+        }
+    });
 });
