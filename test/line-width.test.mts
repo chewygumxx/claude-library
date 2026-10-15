@@ -398,4 +398,19 @@ describe("line-width segment: deferred fixes", () => {
             wide(`> > \u00a0\u00a0\u00a0${LONG}`),
         ]);
     });
+
+    test("combining marks take no cells", () => {
+        // 20 cells as 40 code points: within the measure.
+        const line = `See ${"e\u0301".repeat(20)} now`;
+        expect(segment(line, COLUMNS)).toEqual([prose(line)]);
+    });
+
+    test("an emoji drawn wide marks a word never long", () => {
+        for (const line of [
+            `See \u2705${LONG} now`,
+            `See \u26a0\ufe0f${LONG} now`,
+        ]) {
+            expect(segment(line, COLUMNS)).toEqual([prose(line)]);
+        }
+    });
 });

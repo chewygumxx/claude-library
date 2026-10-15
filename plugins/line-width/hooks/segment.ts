@@ -40,9 +40,12 @@ const LINK =
     /!?\[([^\]\n]*)\]\(\s*(?:<[^<>\n]*>|(?:[^()\s]|\([^()\s]*\))*)(?:\s+(?:"[^"\n]*"|'[^'\n]*'|\([^()\n]*\)))?\s*\)/y;
 const BACKTICKS = /`+/y;
 const AUTOLINK = /<([a-z][a-z0-9+.-]*:[^<>\s]*)>/iy;
-// East Asian Wide and Fullwidth ranges, and emoji: two cells each.
+// East Asian Wide and Fullwidth ranges, emoji drawn as emoji, and a
+// pictograph a variation selector asks to draw so: two cells each.
 const WIDE_CHARACTER =
-    /[\u{1100}-\u{115f}\u{2e80}-\u{a4cf}\u{ac00}-\u{d7a3}\u{f900}-\u{faff}\u{fe30}-\u{fe4f}\u{ff00}-\u{ff60}\u{ffe0}-\u{ffe6}\u{1f300}-\u{1faff}\u{20000}-\u{3fffd}]/u;
+    /[\u{1100}-\u{115f}\u{2e80}-\u{a4cf}\u{ac00}-\u{d7a3}\u{f900}-\u{faff}\u{fe30}-\u{fe4f}\u{ff00}-\u{ff60}\u{ffe0}-\u{ffe6}\u{1f300}-\u{1faff}\u{20000}-\u{3fffd}]|\p{Emoji_Presentation}|\p{Extended_Pictographic}\u{fe0f}/u;
+// Combining marks, joiners and variation selectors: no cells.
+const ZERO_WIDTH = /\p{M}|[\u{200b}-\u{200d}\u{2060}]/u;
 
 type Part = { kind: Piece["kind"]; text: string };
 type Token = { start: number; end: number; drawn: string };
@@ -450,8 +453,18 @@ function at(pattern: RegExp, line: string, index: number) {
 function isLong(drawn: string, room: number): boolean {
     return (
         !WIDE_CHARACTER.test(drawn) &&
-        drawn.split(/\s+/).some((run) => [...run].length > room)
+        drawn.split(/\s+/).some((run) => cellsOf(run) > room)
     );
+}
+
+// A run's width in terminal cells, short of wide characters, which the
+// caller has ruled out: zero-width characters take none, others one.
+function cellsOf(run: string): number {
+    let count = 0;
+    for (const char of run) {
+        count += ZERO_WIDTH.test(char) ? 0 : 1;
+    }
+    return count;
 }
 
 // Keeps a part after a cut from opening a list, heading, quote or fence,
