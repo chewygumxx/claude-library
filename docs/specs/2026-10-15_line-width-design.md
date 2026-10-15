@@ -46,7 +46,7 @@ mobile) are left alone.
 | ------------------------------- | -------------------------------------------------------------------------------------------- |
 | A paragraph holding a long word | The text before it wraps at 80, the word takes a line of its own, the rest wraps at 80 again |
 | Code fences                     | Exempt, as tables are                                                                        |
-| How the pieces are drawn        | The engine's own drawing, one `next` call per piece                                          |
+| How the pieces are drawn        | The mod's own `Markdown` elements beside a bullet of its own (the probe's finding)           |
 | What 80 measures                | The text alone, after the two-column bullet gutter                                           |
 | What counts as long             | A word whose drawn width in terminal cells exceeds the room its line has                     |
 | Wide (CJK) characters           | A word holding any is never long, so it wraps within the measure                             |
@@ -183,24 +183,25 @@ line had:
 
 ## Drawing
 
-`on('ui.render', { component: 'AssistantMessage' }, hook)`, its `Box`
-taken from `$.ui.resolve(e)`:
+`on('ui.render', { component: 'AssistantMessage' }, hook)`, its `Box`,
+`Text` and `Markdown` taken from `$.ui.resolve(e)`:
 
 1. Pass through, `return next(e)`, when the surface is not `terminal`,
    when `e.props.isSummary` is set, or when `e.viewport` is absent or its
    `columns` is at most `columns + 2`
-2. Segment the text. One `wide` piece, the whole block a table or a fence,
-   passes through too
-3. Fast path, one `prose` piece at `indent` 0:
-   `<Box width={columns + 2}>{await next(e)}</Box>`, the `+ 2` being the
-   bullet gutter
-4. Pieces: each drawn by `next` with `e.props` spread, its own `text` and
-   an `isFirstOfReply` of `e.props.isFirstOfReply` on the first piece and
-   `false` on the rest. A `prose` piece sits in a `Box`
-   of `width` `columns + 2`, a `wide` piece in a `Box` with no width, so it
-   wraps only at the terminal's edge. Either has `paddingLeft` of its
-   `indent` and `marginTop` of 1 when `gapBefore`. All of them sit in one
-   `Box` of `flexDirection` `column`
+2. Segment the text. No piece, or one `wide` piece, the whole block a
+   table or a fence, passes through too
+3. Otherwise the hook draws the block itself and never calls `next`. Each
+   piece is one `Markdown` of its `text`, drawn as an assistant reply is.
+   A `prose` piece sits in a `Box` of `width` `columns`, a `wide` piece in
+   a `Box` with no width, so it runs to the terminal's edge. Either has
+   `paddingLeft` of its `indent` and `marginTop` of 1 when `gapBefore`.
+   The pieces sit in one `Box` of `flexDirection` `column`
+4. When `e.props.isFirstOfReply` is set, a `Box` of `width` 2 holding a
+   `●` in the theme's `text` colour stands to the left of the pieces, as
+   the engine's bullet and gutter do; otherwise there is none, as the
+   engine draws none. The whole sits in a `Box` of `flexDirection` `row`
+   and `marginTop` 1, the blank row the engine draws above each block
 
 The hook guards nothing, so it takes no `.catch`: one that throws is skipped
 and the engine draws the reply itself.
@@ -226,6 +227,26 @@ elements beside a bullet of its own instead. Should the fifth, a long token
 in an ordered list item is not cut out and wraps in its prose. Should the
 second, the design is revisited.
 
+### Findings
+
+Probed on 2026-10-15 with Claude Code 2.1.300 in a 160-column terminal:
+
+1. Several `next` calls: yes, each piece is drawn
+2. Width: no. A tree holding an engine node under a `Box` with `width` is
+   refused (`engine node under a Box with prop "width"`) and the engine
+   draws its own. A `paddingRight` narrowing is accepted and wraps at
+   whitespace
+3. Gutter: no. A block drawn with `isFirstOfReply` false has neither
+   bullet nor gutter
+4. Blank rows: the engine draws a blank row above every block it draws,
+   so pieces drawn by it are always a row apart, cut parts included
+5. Numbering: a block opening `3.` draws as 3
+
+The second and fourth together rule out the engine's drawing, so the
+blocks are drawn as the mod's own `Markdown`, which a second probe showed
+to wrap at the measure, keep numbering and leave the spacing to the mod.
+The engine's bullet is drawn in the theme's `text` colour.
+
 ## Testing
 
 - `test/line-width.test.mts`, run by `bun run test` and CI, holds the
@@ -250,9 +271,12 @@ second, the design is revisited.
   `next` call and answers a marker. Cases:
   - pass-through on `desktop`, on a summary, on a narrow viewport and on a
     block that is one table
-  - the fast path's one `Box` of width 82
-  - a block holding a table drawn by three `next` calls, the first alone
-    carrying `isFirstOfReply`, `onScreen` carried on each
+  - plain prose drawn as one `Markdown` of width 80 beside the bullet,
+    with no `next` call
+  - a block holding a table drawn as three `Markdown` pieces, the table's
+    `Box` with no width
+  - a list item's cut parts padded by its indent
+  - a block that is not the first of its reply drawn with no bullet
   - a `columns` option of 60 honoured
 - Two mise tasks join `check`, as `lint:plugins` does:
   - `test:plugins` runs `claude plugin test` on each plugin holding a
