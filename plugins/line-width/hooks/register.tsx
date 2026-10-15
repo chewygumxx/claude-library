@@ -20,12 +20,23 @@ import { segment } from "./segment.ts";
 // The columns the engine's bullet and the space after it take.
 const GUTTER = 2;
 
+// A tree draws the first 100,000 characters of its texts and drops the
+// rest; a block near that, with the escapes and quote bars the cuts add,
+// is left to the engine, which draws it whole.
+const MAX_TEXT = 90_000;
+
 export const register: Register = (on, options) => {
     const columns = typeof options.columns === "number" ? options.columns : 80;
 
     on("ui.render", { component: "AssistantMessage" }, ($, e, next) => {
         const isRoomy = (e.viewport?.columns ?? 0) > columns + GUTTER;
-        if (e.surface !== "terminal" || e.props.isSummary || !isRoomy) {
+        const isLong = e.props.text.length > MAX_TEXT;
+        if (
+            e.surface !== "terminal" ||
+            e.props.isSummary ||
+            !isRoomy ||
+            isLong
+        ) {
             return next(e);
         }
         const pieces = segment(e.props.text, columns);

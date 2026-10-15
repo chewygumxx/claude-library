@@ -111,6 +111,13 @@ describe("line-width hook", () => {
         expect(await draw($, "")).toMatchObject({ type: "Text" });
     });
 
+    test("leaves a block longer than a tree draws", async ($, on) => {
+        const calls = engine(on);
+        const text = "Word ".repeat(20_000);
+        expect(await draw($, text)).toMatchObject({ type: "Text" });
+        expect(calls.length).toBe(1);
+    });
+
     test("leaves a block of one table or one URL", async ($, on) => {
         const calls = engine(on);
         expect(await draw($, TABLE)).toMatchObject({ type: "Text" });
