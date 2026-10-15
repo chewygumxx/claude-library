@@ -1,6 +1,6 @@
 ---
 ctime: 2026-10-15
-mtime: 2026-10-15
+mtime: 2026-10-16
 spdx: GPL-3.0-only
 title: "Line Width: implementation plan"
 description: >-
@@ -59,8 +59,9 @@ plan argues from it.
 - `bun run check` runs every check CI runs; tools come from `mise.toml`
   and `package.json`
 - The measure: `columns`, a `userConfig` number, default 80, min 40, max
-  200; the bullet gutter is 2 columns, so prose boxes are `columns + 2`
-  wide
+  200; prose boxes are `columns` wide, the 2-column bullet gutter drawn
+  beside them, and the hook passes through in a viewport of at most
+  `columns + 2`
 - The hook acts on the `terminal` surface only, never changes stored
   messages, and passes through whenever it is unsure
 - The engine's API is in
