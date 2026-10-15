@@ -36,6 +36,12 @@ export default defineConfig({
             description: "Plugin: Hooks to write file headers",
         },
         {
+            name: "line-width",
+            fullName: "Line Width",
+            description:
+                "Plugin: ui.render hook wrapping replies to 80 columns",
+        },
+        {
             name: "plugin-lint",
             fullName: "Plugin Lint",
             description:
