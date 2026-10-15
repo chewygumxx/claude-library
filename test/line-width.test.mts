@@ -97,3 +97,89 @@ describe("line-width segment: blocks", () => {
         ]);
     });
 });
+
+// 25 cells, over the measure of 20.
+const LONG = "/home/user/a/long/path.ts";
+// 31 cells.
+const URL = "https://example.com/a/long/path";
+
+describe("line-width segment: long tokens", () => {
+    test("a long URL mid-sentence takes a line of its own", () => {
+        expect(segment(`See ${URL} for more.`, COLUMNS)).toEqual([
+            prose("See"),
+            wide(URL),
+            prose("for more."),
+        ]);
+    });
+
+    test("a reply of one long URL is one wide piece", () => {
+        expect(segment(URL, COLUMNS)).toEqual([wide(URL)]);
+    });
+
+    test("an autolink is cut whole", () => {
+        expect(segment(`See <${URL}> now`, COLUMNS)).toEqual([
+            prose("See"),
+            wide(`<${URL}>`),
+            prose("now"),
+        ]);
+    });
+
+    test("a link is measured by its label, never its target", () => {
+        const line = `See [the docs](${URL}) now`;
+        expect(segment(line, COLUMNS)).toEqual([prose(line)]);
+    });
+
+    test("a code span holding spaces is cut whole", () => {
+        expect(segment(`Run \`cat ${LONG}\` first`, COLUMNS)).toEqual([
+            prose("Run"),
+            wide(`\`cat ${LONG}\``),
+            prose("first"),
+        ]);
+    });
+
+    test("an unclosed backtick is a literal character", () => {
+        expect(segment(`Run \`${LONG} now`, COLUMNS)).toEqual([
+            prose("Run"),
+            wide(`\`${LONG}`),
+            prose("now"),
+        ]);
+    });
+
+    test("a long word inside open emphasis is not cut", () => {
+        const line = `**Note ${LONG} here**`;
+        expect(segment(line, COLUMNS)).toEqual([prose(line)]);
+    });
+
+    test("a rest that would open a list is escaped", () => {
+        expect(segment(`${LONG} - then`, COLUMNS)).toEqual([
+            wide(LONG),
+            prose("\\- then"),
+        ]);
+        expect(segment(`${LONG} 1. then`, COLUMNS)).toEqual([
+            wide(LONG),
+            prose("1\\. then"),
+        ]);
+    });
+
+    test("a rest of emphasis is not escaped", () => {
+        expect(segment(`${LONG} **bold** end`, COLUMNS)).toEqual([
+            wide(LONG),
+            prose("**bold** end"),
+        ]);
+    });
+
+    test("a word exactly the measure stays in its prose", () => {
+        const line = "See abcdefghijabcdefghij now";
+        expect(segment(line, COLUMNS)).toEqual([prose(line)]);
+    });
+
+    test("CJK text is never cut", () => {
+        const line = "これは長い日本語の文章でスペースがありません";
+        expect(segment(line, COLUMNS)).toEqual([prose(line)]);
+    });
+
+    test("an indented code line outside a list is left whole", () => {
+        const line = `    ${LONG}`;
+        expect(segment(line, COLUMNS)).toEqual([prose(line)]);
+    });
+});
