@@ -48,6 +48,15 @@ export function tempDir(): string {
     return dir;
 }
 
+// The environment less git's own variables. Git sets GIT_DIR for a hook it
+// runs in a linked worktree, which would point every temporary repository
+// at the worktree's: the pre-commit hook runs these tests.
+function hostEnv(): Record<string, string | undefined> {
+    return Object.fromEntries(
+        Object.entries(process.env).filter(([key]) => !key.startsWith("GIT_")),
+    );
+}
+
 // Git isolated from the user's configuration, whose global ignore file or
 // hooks could hide a defect.
 export function gitEnv(): Record<string, string> {
@@ -64,7 +73,7 @@ export function gitEnv(): Record<string, string> {
 
 export function git(dir: string, ...args: string[]): string {
     const run = Bun.spawnSync(["git", "-C", dir, ...args], {
-        env: { ...process.env, ...gitEnv() },
+        env: { ...hostEnv(), ...gitEnv() },
     });
     if (run.exitCode !== 0) {
         throw new Error(`git ${args.join(" ")}: ${run.stderr.toString()}`);
@@ -122,7 +131,7 @@ export function runHook(
     const pluginRoot = join(ROOT, "plugins", plugin);
     const env: Record<string, string> = {};
     for (const [key, value] of Object.entries({
-        ...process.env,
+        ...hostEnv(),
         ...gitEnv(),
         CLAUDE_PLUGIN_ROOT: pluginRoot,
         CLAUDE_PROJECT_DIR: options.project,

@@ -38,6 +38,10 @@
             "source": "./plugins/header-metadata"
         },
         {
+            "name": "line-width",
+            "source": "./plugins/line-width"
+        },
+        {
             "name": "plugin-lint",
             "source": "./plugins/plugin-lint"
         },

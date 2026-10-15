@@ -1,0 +1,27 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    "name": "line-width",
+    "version": "0.0.1",
+    "displayName": "Line Width",
+    "description": "Wraps Claude's replies in the terminal at whitespace to 80 columns, leaving tables, code blocks and long paths and URLs at full width.",
+    "author": {
+        "name": "chewygumxx",
+        "email": "cgumxx@pm.me",
+        "url": "https://github.com/chewygumxx"
+    },
+    "homepage": "https://github.com/chewygumxx/claude-library/tree/main/plugins/line-width",
+    "license": "GPL-3.0-only",
+    "keywords": ["hooks", "ui", "markdown"],
+    "defaultEnabled": true,
+    "hooks": "./hooks/hooks.json",
+    "userConfig": {
+        "columns": {
+            "type": "number",
+            "title": "Columns",
+            "description": "Columns of reply text, after the bullet gutter.",
+            "default": 80,
+            "min": 40,
+            "max": 200
+        }
+    }
+}

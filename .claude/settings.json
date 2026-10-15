@@ -12,19 +12,27 @@
         "remember@claude-plugins-official": true,
         "superpowers@claude-plugins-official": true,
         "plugin-dev@claude-plugins-official": true,
-
+        "common@chewygumxx": true,
+        "plugin-lint@chewygumxx": true,
+        "prohibit-em-dash@chewygumxx": true,
+        "github-mcp@chewygumxx": true,
+        "header-metadata@chewygumxx": true,
+        "repo-metadata@chewygumxx": true,
+        "repo-memory@chewygumxx": true,
+        "shell-lint@chewygumxx": true,
+        "bun-install@chewygumxx": true,
         "biome-lint@chewygumxx": true,
         "context7-mcp@chewygumxx": true,
-        "common@chewygumxx": true,
-        "plugin-lint@chewygumxx": true
+        "compact@chewygumxx": true,
+        "line-width@chewygumxx": true
     },
     "extraKnownMarketplaces": {
         "chewygumxx": {
-            "autoUpdate": true,
             "source": {
                 "source": "github",
                 "repo": "chewygumxx/claude-library"
-            }
+            },
+            "autoUpdate": true
         }
     }
 }
