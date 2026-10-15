@@ -292,4 +292,19 @@ describe("line-width segment: deferred fixes", () => {
             prose("` x"),
         ]);
     });
+
+    // Each streamed token redraws the reply, so segmenting stays linear.
+    test("a line of many long tokens segments in linear time", () => {
+        const line = Array(2000).fill(`a ${LONG}`).join(" ");
+        const start = performance.now();
+        expect(segment(line, COLUMNS).length).toBe(4000);
+        expect(performance.now() - start).toBeLessThan(500);
+    });
+
+    test("many pipe lines with no delimiter row segment in linear time", () => {
+        const text = Array(10000).fill("| a | b |").join("\n");
+        const start = performance.now();
+        expect(segment(text, COLUMNS)).toEqual([prose(text)]);
+        expect(performance.now() - start).toBeLessThan(500);
+    });
 });

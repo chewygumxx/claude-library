@@ -29,8 +29,10 @@ const LIST_ITEM = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/;
 const QUOTE = /^[ \t]*(?:>[ \t]?)+/;
 // A delimiter run that may open emphasis: up to three `*` or `_`, or `~~`.
 const EMPHASIS_OPEN = /^(\*{1,3}|_{1,3}|~~)(?=[^\s/])/;
-const LINK = /^!?\[([^\]\n]*)\]\([^()\s]*\)/;
-const AUTOLINK = /^<([a-z][a-z0-9+.-]*:[^<>\s]*)>/i;
+const EMPHASIS_RUNS = ["*", "**", "***", "_", "__", "___", "~~"];
+const LINK = /!?\[([^\]\n]*)\]\([^()\s]*\)/y;
+const BACKTICKS = /`+/y;
+const AUTOLINK = /<([a-z][a-z0-9+.-]*:[^<>\s]*)>/iy;
 // East Asian Wide and Fullwidth ranges, and emoji: two cells each.
 const WIDE_CHARACTER =
     /[\u{1100}-\u{115f}\u{2e80}-\u{a4cf}\u{ac00}-\u{d7a3}\u{f900}-\u{faff}\u{fe30}-\u{fe4f}\u{ff00}-\u{ff60}\u{ffe0}-\u{ffe6}\u{1f300}-\u{1faff}\u{20000}-\u{3fffd}]/u;
@@ -44,6 +46,7 @@ export function segment(text: string, columns: number): Piece[] {
     let gap = false;
     let inList = false;
     let isCut = false;
+    let plainUntil = 0;
 
     const add = (unit: Unit) => {
         const last = pieces.at(-1);
@@ -74,11 +77,15 @@ export function segment(text: string, columns: number): Piece[] {
             i = end;
             continue;
         }
-        const table = tableEnd(lines, i);
-        if (table > i) {
-            add(block(lines.slice(i, table), "wide"));
-            i = table;
-            continue;
+        if (i >= plainUntil) {
+            const [end, isTable] = tableEnd(lines, i);
+            if (isTable) {
+                add(block(lines.slice(i, end), "wide"));
+                i = end;
+                continue;
+            }
+            // A pipe run with no delimiter row is prose to its end.
+            plainUntil = end;
         }
         if (LIST_ITEM.test(line)) {
             inList = true;
@@ -110,15 +117,16 @@ function fenceEnd(lines: string[], start: number, open: string): number {
     return lines.length;
 }
 
-// The line after a table opening at `start`, or `start` when none does: a
-// run of lines opening with a pipe that holds a delimiter row.
-function tableEnd(lines: string[], start: number): number {
+// The end of the run of lines opening with a pipe from `start`, and
+// whether the run is a table: whether it holds a delimiter row.
+function tableEnd(lines: string[], start: number): [number, boolean] {
     let end = start;
+    let isTable = false;
     while ((lines[end] ?? "").trimStart().startsWith("|")) {
+        isTable ||= DELIMITER_ROW.test((lines[end] ?? "").trim());
         end += 1;
     }
-    const run = lines.slice(start, end);
-    return run.some((row) => DELIMITER_ROW.test(row.trim())) ? end : start;
+    return [end, isTable];
 }
 
 // Lines drawn whole, their common indentation taken as padding.
@@ -170,24 +178,33 @@ function lineUnits(line: string, columns: number, inList: boolean): Unit[] {
     });
 }
 
-// Cuts content around its first long token outside emphasis, then the rest
-// likewise; `room` is the cells its line has. Emphasis opens only where a
-// token later in the line closes it, so `~/path`, `__init__.py` and
-// `**/*.ts` open none.
+// Cuts content around each long token outside emphasis, in one pass;
+// `room` is the cells its line has. Emphasis opens only where a token
+// later in the line closes it, so `~/path`, `__init__.py` and `**/*.ts`
+// open none.
 function cut(content: string, room: number): Part[] {
     const found = tokens(content);
     const raws = found.map((token) => content.slice(token.start, token.end));
+    // Each delimiter run's last closing token, so an opener is checked once.
+    const lastClose = new Map<string, number>();
+    for (const [index, raw] of raws.entries()) {
+        for (const run of EMPHASIS_RUNS) {
+            if (closes(raw, run)) {
+                lastClose.set(run, index);
+            }
+        }
+    }
+    const parts: Part[] = [];
+    let from = 0;
     let open: string | undefined;
     for (const [index, token] of found.entries()) {
         const raw = raws[index] ?? "";
         const before = open;
         const run = EMPHASIS_OPEN.exec(raw)?.[1];
-        const isOpener =
-            open === undefined &&
-            run !== undefined &&
-            raws.slice(index).some((later) => closes(later, run));
-        if (isOpener) {
-            open = run;
+        if (open === undefined && run !== undefined) {
+            if ((lastClose.get(run) ?? -1) >= index) {
+                open = run;
+            }
         }
         if (open !== undefined && closes(raw, open)) {
             open = undefined;
@@ -197,18 +214,20 @@ function cut(content: string, room: number): Part[] {
             open === undefined &&
             isLong(token.drawn, room)
         ) {
-            const head = content.slice(0, token.start).trimEnd();
-            const tail = content.slice(token.end).trimStart();
-            return [
-                ...(head === ""
-                    ? []
-                    : [{ kind: "prose" as const, text: head }]),
-                { kind: "wide", text: raw },
-                ...(tail === "" ? [] : cut(tail, room)),
-            ];
+            const head = content.slice(from, token.start).trim();
+            if (head !== "") {
+                parts.push({ kind: "prose", text: head });
+            }
+            parts.push({ kind: "wide", text: raw });
+            from = token.end;
         }
     }
-    return [{ kind: "prose", text: content }];
+    const rest = content.slice(from);
+    const tail = from === 0 ? rest : rest.trim();
+    if (tail !== "") {
+        parts.push({ kind: "prose", text: tail });
+    }
+    return parts;
 }
 
 // Whether a token ends with the delimiter run, trailing punctuation aside.
@@ -230,10 +249,10 @@ function tokens(line: string): Token[] {
         let drawn = "";
         while (i < line.length && !/\s/.test(line[i] ?? "")) {
             const char = line[i] ?? "";
-            const span = char === "`" ? codeSpan(line.slice(i)) : undefined;
+            const span = char === "`" ? codeSpan(line, i) : undefined;
             const link =
-                char === "[" || char === "!" ? LINK.exec(line.slice(i)) : null;
-            const autolink = char === "<" ? AUTOLINK.exec(line.slice(i)) : null;
+                char === "[" || char === "!" ? at(LINK, line, i) : null;
+            const autolink = char === "<" ? at(AUTOLINK, line, i) : null;
             if (span) {
                 drawn += span.drawn;
                 i += span.length;
@@ -245,7 +264,7 @@ function tokens(line: string): Token[] {
                 i += autolink[0].length;
             } else if (char === "`") {
                 // An unmatched run is literal, the whole run at once.
-                const run = /^`+/.exec(line.slice(i))?.[0] ?? char;
+                const run = at(BACKTICKS, line, i)?.[0] ?? char;
                 drawn += run;
                 i += run.length;
             } else {
@@ -259,26 +278,35 @@ function tokens(line: string): Token[] {
     return found;
 }
 
-// A code span opening `rest`: its length and the text it draws, or
+// A code span opening at `start`: its length and the text it draws, or
 // undefined when no run of backticks as long closes it.
-function codeSpan(rest: string): { length: number; drawn: string } | undefined {
-    const open = /^`+/.exec(rest)?.[0] ?? "`";
-    let from = open.length;
+function codeSpan(
+    line: string,
+    start: number,
+): { length: number; drawn: string } | undefined {
+    const open = at(BACKTICKS, line, start)?.[0] ?? "`";
+    let from = start + open.length;
     for (;;) {
-        const close = rest.indexOf(open, from);
+        const close = line.indexOf(open, from);
         if (close === -1) {
             return undefined;
         }
         const isExact =
-            rest[close - 1] !== "`" && rest[close + open.length] !== "`";
+            line[close - 1] !== "`" && line[close + open.length] !== "`";
         if (isExact) {
             return {
-                length: close + open.length,
-                drawn: rest.slice(open.length, close).trim(),
+                length: close + open.length - start,
+                drawn: line.slice(start + open.length, close).trim(),
             };
         }
         from = close + 1;
     }
+}
+
+// A sticky pattern's match at `index`, without slicing the line.
+function at(pattern: RegExp, line: string, index: number) {
+    pattern.lastIndex = index;
+    return pattern.exec(line);
 }
 
 // Whether a token's drawn text holds a run too wide for the room; one with
