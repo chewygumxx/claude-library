@@ -18,7 +18,7 @@ tags:
 <!--
    -
    - ~chewygumxx/claude-library.git
-   - ::: :/docs/superpowers/specs/2026-10-15-line-width-design.md
+   - ::: :/docs/specs/2026-10-15_line-width-design.md
    -
    -->
 
@@ -42,13 +42,13 @@ mobile) are left alone.
 
 ## Decisions
 
-| Question | Decision |
-| --- | --- |
+| Question                        | Decision                                                                                     |
+| ------------------------------- | -------------------------------------------------------------------------------------------- |
 | A paragraph holding a long word | The text before it wraps at 80, the word takes a line of its own, the rest wraps at 80 again |
-| Code fences | Exempt, as tables are |
-| How the pieces are drawn | The engine's own drawing, one `next` call per piece |
-| What 80 measures | The text alone, after the two-column bullet gutter |
-| What counts as long | Any word whose visible length exceeds the measure |
+| Code fences                     | Exempt, as tables are                                                                        |
+| How the pieces are drawn        | The engine's own drawing, one `next` call per piece                                          |
+| What 80 measures                | The text alone, after the two-column bullet gutter                                           |
+| What counts as long             | Any word whose visible length exceeds the measure                                            |
 
 ## Layout
 
@@ -57,7 +57,7 @@ registered in the marketplace, `.claude/settings.json` and the commitlint
 scopes, then switched from a shell hook to a hooks module:
 
 - `.claude-plugin/plugin.json`: the house metadata, `"hooks":
-  "./hooks/hooks.json"`, and a `userConfig` number field `columns`,
+"./hooks/hooks.json"`, and a `userConfig` number field `columns`,
   default 80
 - `hooks/hooks.json`: `{ "modules": ["./register.tsx"] }`
 - `hooks/segment.ts`: a pure function cutting markdown into pieces; no
