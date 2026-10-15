@@ -367,4 +367,9 @@ describe("line-width segment: deferred fixes", () => {
             expect(segment(line, COLUMNS)).toEqual([prose(line)]);
         }
     });
+
+    test("a heading line is never cut", () => {
+        const line = `## Title ${LONG} end`;
+        expect(segment(line, COLUMNS)).toEqual([prose(line)]);
+    });
 });

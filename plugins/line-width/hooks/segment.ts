@@ -101,10 +101,11 @@ export function segment(text: string, columns: number): Piece[] {
         // Once a cut has left a list's text in padded pieces, its indented
         // lines are padded too, or they would fall to the margin.
         const shift = isCut ? leading(line) : 0;
-        // A setext heading's lines draw as one heading, so none is cut.
-        const units: Unit[] = isHeading[i]
-            ? [{ kind: "prose", text: line, indent: 0 }]
-            : lineUnits(line.slice(shift), columns - shift, inList);
+        // A heading draws as one, its style on every line, so none is cut.
+        const units: Unit[] =
+            isHeading[i] || HEADING.test(line)
+                ? [{ kind: "prose", text: line, indent: 0 }]
+                : lineUnits(line.slice(shift), columns - shift, inList);
         for (const unit of units) {
             add({ ...unit, indent: unit.indent + shift });
         }
