@@ -317,4 +317,19 @@ describe("line-width segment: deferred fixes", () => {
         const text = "Text\n\n    | a |\n    | - |";
         expect(segment(text, COLUMNS)).toEqual([prose(text)]);
     });
+
+    test("a table without leading pipes is a table", () => {
+        const table = "a | b\n--- | :-:\n1 | 2";
+        expect(segment(`Intro\n\n${table}\n\nAfter`, COLUMNS)).toEqual([
+            prose("Intro"),
+            wide(table, 0, true),
+            prose("After", 0, true),
+        ]);
+    });
+
+    test("a delimiter row must match the header's cells", () => {
+        const text = "| a | b |\n| -";
+        expect(segment(text, COLUMNS)).toEqual([prose(text)]);
+        expect(segment("a | b\n---", COLUMNS)).toEqual([prose("a | b\n---")]);
+    });
 });

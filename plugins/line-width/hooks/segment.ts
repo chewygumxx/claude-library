@@ -24,7 +24,7 @@ type Unit = Omit<Piece, "gapBefore">;
 
 const FENCE = /^[ \t]*(`{3,}|~{3,})/;
 const FENCE_CLOSE = /^[ \t]*(`{3,}|~{3,})[ \t]*$/;
-const DELIMITER_ROW = /^\|?(?:\s*:?-+:?\s*\|)*\s*:?-+:?\s*\|?$/;
+const DELIMITER_CELL = /^\s*:?-+:?\s*$/;
 const LIST_ITEM = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/;
 // Three or more of one of `-`, `*` or `_`, spaces between allowed.
 const THEMATIC_BREAK = /^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/;
@@ -48,7 +48,6 @@ export function segment(text: string, columns: number): Piece[] {
     let gap = false;
     let inList = false;
     let isCut = false;
-    let plainUntil = 0;
 
     const add = (unit: Unit) => {
         const last = pieces.at(-1);
@@ -79,15 +78,11 @@ export function segment(text: string, columns: number): Piece[] {
             i = end;
             continue;
         }
-        if (i >= plainUntil && (leading(line) <= 3 || inList)) {
-            const [end, isTable] = tableEnd(lines, i);
-            if (isTable) {
-                add(block(lines.slice(i, end), "wide"));
-                i = end;
-                continue;
-            }
-            // A pipe run with no delimiter row is prose to its end.
-            plainUntil = end;
+        const table = leading(line) <= 3 || inList ? tableEnd(lines, i) : i;
+        if (table > i) {
+            add(block(lines.slice(i, table), "wide"));
+            i = table;
+            continue;
         }
         if (THEMATIC_BREAK.test(line)) {
             inList = false;
@@ -121,16 +116,35 @@ function fenceEnd(lines: string[], start: number, open: string): number {
     return lines.length;
 }
 
-// The end of the run of lines opening with a pipe from `start`, and
-// whether the run is a table: whether it holds a delimiter row.
-function tableEnd(lines: string[], start: number): [number, boolean] {
-    let end = start;
-    let isTable = false;
-    while ((lines[end] ?? "").trimStart().startsWith("|")) {
-        isTable ||= DELIMITER_ROW.test((lines[end] ?? "").trim());
+// The line after a table opening at `start`, or `start` when none does: a
+// header row holding a pipe, a delimiter row of as many cells, then rows
+// holding a pipe, as GitHub's markdown reads them.
+function tableEnd(lines: string[], start: number): number {
+    const header = lines[start] ?? "";
+    const delimiter = lines[start + 1] ?? "";
+    const columns = cells(delimiter);
+    const isTable =
+        header.includes("|") &&
+        delimiter.includes("|") &&
+        columns.every((cell) => DELIMITER_CELL.test(cell)) &&
+        columns.length === cells(header).length;
+    if (!isTable) {
+        return start;
+    }
+    let end = start + 2;
+    while ((lines[end] ?? "").includes("|") && (lines[end] ?? "").trim()) {
         end += 1;
     }
-    return [end, isTable];
+    return end;
+}
+
+// A row's cells: split at each pipe not escaped, outer pipes dropped.
+function cells(row: string): string[] {
+    const inner = row
+        .trim()
+        .replace(/^\|/, "")
+        .replace(/(?<!\\)\|$/, "");
+    return inner.split(/(?<!\\)\|/);
 }
 
 // Lines drawn whole, their common indentation taken as padding.
