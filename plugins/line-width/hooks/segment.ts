@@ -46,14 +46,19 @@ const WIDE_CHARACTER =
 
 type Part = { kind: Piece["kind"]; text: string };
 type Token = { start: number; end: number; drawn: string };
+// Emphasis a line carries in from the paragraph's lines above, and the runs
+// the paragraph's lines below close.
+type Emphasis = { open: string | undefined; below: ReadonlySet<string> };
 
 export function segment(text: string, columns: number): Piece[] {
     const lines = text.split(/\r?\n/);
     const isHeading = setextBodies(lines);
+    const below = closersBelow(lines);
     const pieces: Piece[] = [];
     let gap = false;
     let inList = false;
     let isCut = false;
+    let open: string | undefined;
 
     const add = (unit: Unit) => {
         const last = pieces.at(-1);
@@ -74,6 +79,7 @@ export function segment(text: string, columns: number): Piece[] {
         const line = lines[i] ?? "";
         if (line.trim() === "") {
             gap = true;
+            open = undefined;
             i += 1;
             continue;
         }
@@ -81,14 +87,19 @@ export function segment(text: string, columns: number): Piece[] {
         if (fence && (leading(line) <= 3 || inList)) {
             const end = fenceEnd(lines, i, fence[1] ?? "```");
             add(block(lines.slice(i, end), "wide"));
+            open = undefined;
             i = end;
             continue;
         }
         const table = leading(line) <= 3 || inList ? tableEnd(lines, i) : i;
         if (table > i) {
             add(block(lines.slice(i, table), "wide"));
+            open = undefined;
             i = table;
             continue;
+        }
+        if (startsBlock(line)) {
+            open = undefined;
         }
         if (THEMATIC_BREAK.test(line)) {
             inList = false;
@@ -102,10 +113,17 @@ export function segment(text: string, columns: number): Piece[] {
         // lines are padded too, or they would fall to the margin.
         const shift = isCut ? leading(line) : 0;
         // A heading draws as one, its style on every line, so none is cut.
+        const emphasis = { open, below: below[i] ?? new Set<string>() };
         const units: Unit[] =
             isHeading[i] || HEADING.test(line)
                 ? [{ kind: "prose", text: line, indent: 0 }]
-                : lineUnits(line.slice(shift), columns - shift, inList);
+                : lineUnits(
+                      line.slice(shift),
+                      columns - shift,
+                      inList,
+                      emphasis,
+                  );
+        open = emphasis.open;
         for (const unit of units) {
             add({ ...unit, indent: unit.indent + shift });
         }
@@ -113,6 +131,38 @@ export function segment(text: string, columns: number): Piece[] {
         i += 1;
     }
     return pieces;
+}
+
+// Per line, the emphasis runs closed by the lines below it in its
+// paragraph, so an opener whose closer is on a later line counts.
+function closersBelow(lines: string[]): ReadonlySet<string>[] {
+    const result: ReadonlySet<string>[] = lines.map(() => new Set<string>());
+    let found = new Set<string>();
+    for (let i = lines.length - 1; i >= 0; i -= 1) {
+        const line = lines[i] ?? "";
+        result[i] = found;
+        if (line.trim() === "" || startsBlock(line)) {
+            found = new Set();
+            continue;
+        }
+        found = new Set(found);
+        for (const token of tokens(line)) {
+            const raw = line.slice(token.start, token.end);
+            for (const run of EMPHASIS_RUNS) {
+                if (closes(raw, run)) {
+                    found.add(run);
+                }
+            }
+        }
+    }
+    return result;
+}
+
+// Whether a line opens a block of its own, ending any paragraph above.
+function startsBlock(line: string): boolean {
+    return [LIST_ITEM, HEADING, FENCE, THEMATIC_BREAK].some((pattern) =>
+        pattern.test(line),
+    );
 }
 
 // Which lines are a setext heading's text: the paragraph lines above an
@@ -203,7 +253,12 @@ function leading(line: string): number {
 // each carrying the line's context: a list item's marker stays with the
 // first part and later parts sit under its text, a continuation line's
 // indent becomes padding, and every part of a quote keeps the bar.
-function lineUnits(line: string, columns: number, inList: boolean): Unit[] {
+function lineUnits(
+    line: string,
+    columns: number,
+    inList: boolean,
+    emphasis: Emphasis,
+): Unit[] {
     const quote = QUOTE.exec(line)?.[0];
     const item = quote === undefined ? LIST_ITEM.exec(line)?.[0] : undefined;
     const lead = leading(line);
@@ -213,7 +268,11 @@ function lineUnits(line: string, columns: number, inList: boolean): Unit[] {
     }
     const isContinuation = isPlain && inList && lead > 0;
     const marker = quote ?? item ?? (isContinuation ? line.slice(0, lead) : "");
-    const parts = cut(line.slice(marker.length), columns - marker.length);
+    const parts = cut(
+        line.slice(marker.length),
+        columns - marker.length,
+        emphasis,
+    );
     if (parts.length === 1 && parts[0]?.kind === "prose") {
         return [{ kind: "prose", text: line, indent: 0 }];
     }
@@ -235,9 +294,10 @@ function lineUnits(line: string, columns: number, inList: boolean): Unit[] {
 
 // Cuts content around each long token outside emphasis, in one pass;
 // `room` is the cells its line has. Emphasis opens only where a token
-// later in the line closes it, so `~/path`, `__init__.py` and `**/*.ts`
-// open none.
-function cut(content: string, room: number): Part[] {
+// later in the line, or in the paragraph's lines below, closes it, so
+// `~/path`, `__init__.py` and `**/*.ts` open none. Emphasis open at the
+// line's end is left in `emphasis` for the next line.
+function cut(content: string, room: number, emphasis: Emphasis): Part[] {
     const found = tokens(content);
     const raws = found.map((token) => content.slice(token.start, token.end));
     // Each delimiter run's last closing token, so an opener is checked once.
@@ -251,13 +311,15 @@ function cut(content: string, room: number): Part[] {
     }
     const parts: Part[] = [];
     let from = 0;
-    let open: string | undefined;
+    let open = emphasis.open;
     for (const [index, token] of found.entries()) {
         const raw = raws[index] ?? "";
         const before = open;
         const run = EMPHASIS_OPEN.exec(raw)?.[1];
         if (open === undefined && run !== undefined) {
-            if ((lastClose.get(run) ?? -1) >= index) {
+            const isClosed =
+                (lastClose.get(run) ?? -1) >= index || emphasis.below.has(run);
+            if (isClosed) {
                 open = run;
             }
         }
@@ -277,6 +339,7 @@ function cut(content: string, room: number): Part[] {
             from = token.end;
         }
     }
+    emphasis.open = open;
     const rest = content.slice(from);
     const tail = from === 0 ? rest : rest.trim();
     if (tail !== "") {

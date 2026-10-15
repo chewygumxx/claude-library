@@ -372,4 +372,17 @@ describe("line-width segment: deferred fixes", () => {
         const line = `## Title ${LONG} end`;
         expect(segment(line, COLUMNS)).toEqual([prose(line)]);
     });
+
+    test("emphasis open across lines keeps a long word whole", () => {
+        const text = `**Note\n${LONG} here**`;
+        expect(segment(text, COLUMNS)).toEqual([prose(text)]);
+    });
+
+    test("a blank line ends emphasis left open", () => {
+        expect(segment(`**Note\n\n${LONG} here**`, COLUMNS)).toEqual([
+            prose("**Note"),
+            wide(LONG, 0, true),
+            prose("here**"),
+        ]);
+    });
 });
