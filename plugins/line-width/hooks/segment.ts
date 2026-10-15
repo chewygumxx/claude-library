@@ -27,6 +27,8 @@ const FENCE_CLOSE = /^[ \t]*(`{3,}|~{3,})[ \t]*$/;
 const DELIMITER_ROW = /^\|?(?:\s*:?-+:?\s*\|)*\s*:?-+:?\s*\|?$/;
 const LIST_ITEM = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/;
 const QUOTE = /^[ \t]*(?:>[ \t]?)+/;
+// A delimiter run that may open emphasis: up to three `*` or `_`, or `~~`.
+const EMPHASIS_OPEN = /^(\*{1,3}|_{1,3}|~~)(?=[^\s/])/;
 const LINK = /^!?\[([^\]\n]*)\]\([^()\s]*\)/;
 const AUTOLINK = /^<([a-z][a-z0-9+.-]*:[^<>\s]*)>/i;
 // East Asian Wide and Fullwidth ranges, and emoji: two cells each.
@@ -41,6 +43,7 @@ export function segment(text: string, columns: number): Piece[] {
     const pieces: Piece[] = [];
     let gap = false;
     let inList = false;
+    let isCut = false;
 
     const add = (unit: Unit) => {
         const last = pieces.at(-1);
@@ -82,9 +85,15 @@ export function segment(text: string, columns: number): Piece[] {
         } else if (leading(line) === 0) {
             inList = false;
         }
-        for (const unit of lineUnits(line, columns, inList)) {
-            add(unit);
+        isCut &&= inList;
+        // Once a cut has left a list's text in padded pieces, its indented
+        // lines are padded too, or they would fall to the margin.
+        const shift = isCut ? leading(line) : 0;
+        const units = lineUnits(line.slice(shift), columns - shift, inList);
+        for (const unit of units) {
+            add({ ...unit, indent: unit.indent + shift });
         }
+        isCut ||= inList && (units.length > 1 || units[0]?.kind === "wide");
         i += 1;
     }
     return pieces;
@@ -162,16 +171,32 @@ function lineUnits(line: string, columns: number, inList: boolean): Unit[] {
 }
 
 // Cuts content around its first long token outside emphasis, then the rest
-// likewise; `room` is the cells its line has.
+// likewise; `room` is the cells its line has. Emphasis opens only where a
+// token later in the line closes it, so `~/path`, `__init__.py` and
+// `**/*.ts` open none.
 function cut(content: string, room: number): Part[] {
-    let depth = 0;
-    for (const token of tokens(content)) {
-        const raw = content.slice(token.start, token.end);
-        const before = depth;
-        const opens = /^[*_~]/.test(raw) ? 1 : 0;
-        const closes = /[*_~][.,;:!?)]*$/.test(raw) ? 1 : 0;
-        depth = Math.max(0, depth + opens - closes);
-        if (before === 0 && depth === 0 && isLong(token.drawn, room)) {
+    const found = tokens(content);
+    const raws = found.map((token) => content.slice(token.start, token.end));
+    let open: string | undefined;
+    for (const [index, token] of found.entries()) {
+        const raw = raws[index] ?? "";
+        const before = open;
+        const run = EMPHASIS_OPEN.exec(raw)?.[1];
+        const isOpener =
+            open === undefined &&
+            run !== undefined &&
+            raws.slice(index).some((later) => closes(later, run));
+        if (isOpener) {
+            open = run;
+        }
+        if (open !== undefined && closes(raw, open)) {
+            open = undefined;
+        }
+        if (
+            before === undefined &&
+            open === undefined &&
+            isLong(token.drawn, room)
+        ) {
             const head = content.slice(0, token.start).trimEnd();
             const tail = content.slice(token.end).trimStart();
             return [
@@ -184,6 +209,11 @@ function cut(content: string, room: number): Part[] {
         }
     }
     return [{ kind: "prose", text: content }];
+}
+
+// Whether a token ends with the delimiter run, trailing punctuation aside.
+function closes(raw: string, run: string): boolean {
+    return raw.replace(/[.,;:!?)]+$/, "").endsWith(run);
 }
 
 // The line's whitespace-separated tokens, each with the text it draws; a

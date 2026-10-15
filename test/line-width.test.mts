@@ -230,3 +230,56 @@ describe("line-width segment: context across a cut", () => {
         expect(segment(`- ${word}`, COLUMNS)).toEqual([wide(`- ${word}`)]);
     });
 });
+
+describe("line-width segment: review fixes", () => {
+    test("a word opening with ~ or _ opens no emphasis", () => {
+        expect(segment(`It takes ~5 minutes at ${LONG} now`, COLUMNS)).toEqual([
+            prose("It takes ~5 minutes at"),
+            wide(LONG),
+            prose("now"),
+        ]);
+        expect(segment(`See ~/a ${LONG} now`, COLUMNS)).toEqual([
+            prose("See ~/a"),
+            wide(LONG),
+            prose("now"),
+        ]);
+        expect(segment(`Edit __init__.py and ${LONG}`, COLUMNS)).toEqual([
+            prose("Edit __init__.py and"),
+            wide(LONG),
+        ]);
+    });
+
+    test("a glob opening with ** opens no emphasis", () => {
+        expect(segment(`Match **/*.ts in ${LONG}`, COLUMNS)).toEqual([
+            prose("Match **/*.ts in"),
+            wide(LONG),
+        ]);
+    });
+
+    test("an item's later lines stay under it after a cut", () => {
+        expect(segment(`- See ${LONG} now\n  more text`, COLUMNS)).toEqual([
+            prose("- See"),
+            wide(LONG, 2),
+            prose("now\nmore text", 2),
+        ]);
+        expect(segment(`- See ${LONG} now\n  - nested`, COLUMNS)).toEqual([
+            prose("- See"),
+            wide(LONG, 2),
+            prose("now\n- nested", 2),
+        ]);
+        expect(segment(`1. See ${LONG} now\n   more text`, COLUMNS)).toEqual([
+            prose("1. See"),
+            wide(LONG, 3),
+            prose("now\nmore text", 3),
+        ]);
+    });
+
+    test("a line at the margin ends the carried indent", () => {
+        expect(segment(`- See ${LONG}\n  more\nAfter`, COLUMNS)).toEqual([
+            prose("- See"),
+            wide(LONG, 2),
+            prose("more", 2),
+            prose("After"),
+        ]);
+    });
+});
