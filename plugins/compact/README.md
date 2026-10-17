@@ -1,6 +1,6 @@
 ---
 ctime: 2026-10-09
-mtime: 2026-10-09
+mtime: 2026-10-18
 spdx: GPL-3.0-only
 title: Compact
 description: >-
@@ -24,9 +24,9 @@ tags:
 
 Generate a compaction invocation.
 
-Run `/compact:compact` and Claude writes a `/compact <instructions>` to run,
-then justifies and rates it in four fixed lines, for a person or a driver to
-parse:
+Run `/compact:compact-summary` and Claude writes a `/compact <instructions>`
+to run, then justifies and rates it in four fixed lines, for a person or a
+driver to parse:
 
 - Appraisal, 1-100: the share of the context the foreseeable work no longer
   needs, the benefit of compacting
@@ -35,8 +35,13 @@ parse:
 
 A driver measures how full the context is itself and compacts when it is
 full enough, Appraisal is high enough and Risk is low enough. A driver that
-knows the next task passes it as `/compact:compact <foreseeable work>`, and
-both ratings judge against it rather than Claude's own expectation.
+knows the next task passes it as
+`/compact:compact-summary <foreseeable work>`, and both ratings judge against
+it rather than Claude's own expectation.
+
+The skill is named `compact-summary`, not `compact`: installed on its own,
+as `skills add` installs it, a skill's name is its command, and one named
+`compact` would take the place of Claude Code's own `/compact`.
 
 The skill is user invoked only. As a standing instruction in `CLAUDE.md`, the
 same request cost tokens in every session, prompted superfluous summaries

@@ -1,9 +1,9 @@
 ---
 ctime: 2026-10-09
-mtime: 2026-10-09
+mtime: 2026-10-18
 spdx: GPL-3.0-only
-title: Compact
-name: compact
+title: Compact Summary
+name: compact-summary
 description: >-
   Generate a compaction invocation
 tags:
@@ -16,7 +16,7 @@ disable-model-invocation: true
 <!--
    -
    - ~chewygumxx/claude-library.git
-   - ::: :/plugins/compact/skills/compact/SKILL.md
+   - ::: :/plugins/compact/skills/compact-summary/SKILL.md
    -
    -->
 
