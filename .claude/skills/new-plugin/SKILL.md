@@ -1,6 +1,6 @@
 ---
 ctime: 2026-10-03
-mtime: 2026-10-05
+mtime: 2026-10-18
 spdx: GPL-3.0-only
 title: New plugin
 name: new-plugin
@@ -11,6 +11,9 @@ tags:
 argument-hint: <name> <what the plugin should do>
 disable-model-invocation: true
 allowed-tools: Bash(bun .claude/skills/new-plugin/scripts/new-plugin.mts *)
+# Hidden from `skills add`: it maintains this marketplace alone.
+metadata:
+  internal: true
 ---
 
 <!--
