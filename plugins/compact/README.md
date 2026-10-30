@@ -43,8 +43,10 @@ The skill is named `compact-summary`, not `compact`: installed on its own,
 as `skills add` installs it, a skill's name is its command, and one named
 `compact` would take the place of Claude Code's own `/compact`.
 
-The skill is user invoked only. As a standing instruction in `CLAUDE.md`, the
-same request cost tokens in every session, prompted superfluous summaries
-when context was low and still had to be asked for when context was high.
+Claude may also load the skill of its own accord, when its description fits
+the moment. It is a skill rather than a standing instruction in `CLAUDE.md`:
+as one, the same request cost tokens in every session, prompted superfluous
+summaries when context was low and still had to be asked for when context
+was high.
 
 <!-- vim:set expandtab shiftwidth=2 filetype=markdown foldlevel=3: -->
