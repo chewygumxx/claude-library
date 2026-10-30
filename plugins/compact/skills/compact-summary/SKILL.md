@@ -1,6 +1,6 @@
 ---
 ctime: 2026-10-09
-mtime: 2026-10-18
+mtime: 2026-10-31
 spdx: GPL-3.0-only
 title: Compact Summary
 name: compact-summary
@@ -10,7 +10,6 @@ tags:
   - llm
   - claude
 argument-hint: "[foreseeable work]"
-disable-model-invocation: true
 ---
 
 <!--
